@@ -10,7 +10,7 @@
 
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
-import { spaces, agents, panes, focused, run, openOverlay, theme, props, home, layout, window, updates, setAgentOrder } from "herdr";
+import { spaces, agents, panes, terminals, focused, run, openOverlay, theme, props, home, layout, window, updates, setAgentOrder } from "herdr";
 
 const SPIN = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 const G = {
@@ -204,7 +204,18 @@ export default class LazyVim extends View {
     return v_flex().id("explorer").size_full().bg(t.chrome).text_size(12.5).py(4).overflow_y_scrollbar().children(rows);
   }
 
+  // Live sub-agents (`hc run` children) under `addr`, depth first. Paneless ones
+  // aren't in agents(), so they come from terminals().
+  kids(all, addr, lead = "") {
+    const kids = all.filter((k) => k.parent === addr && k.state === "live");
+    return kids.flatMap((k, i) => {
+      const last = i === kids.length - 1;
+      return [{ k, guide: lead + (last ? "└╴" : "├╴") }, ...this.kids(all, k.address, lead + (last ? "  " : "│ "))];
+    });
+  }
+
   trouble(t) {
+    const all = terminals();
     const list = [...agents()].sort((a, b) => (b.pinned - a.pinned) || (URGENCY[a.status] - URGENCY[b.status]) || (a.seq - b.seq));
     setAgentOrder(list.map((a) => a.address));
     const groups = [];
@@ -232,6 +243,17 @@ export default class LazyVim extends View {
           .child(icon(t, a.program, 13))
           .child(div().flex_1().truncate().text_color(a.focused ? t.foreground : t.muted).child(a.title || a.program?.name || a.address))
           .child(div().flex_none().text_color(t.dim).child(`[${a.tab_name || a.tab_index}]`)));
+        // A sub-agent reports to its parent: error reads as blocked, done as idle.
+        for (const { k, guide } of this.kids(all, a.address)) {
+          const st = k.status === "error" ? "blocked" : k.status === "done" ? "idle" : k.status;
+          rows.push(h_flex().id(`sub-${k.address}`).h(22).pl(22).pr(8).gap(6).items_center().flex_none()
+            .hover((s) => s.bg(t.hover)).on_click(() => run("terminal.peek", { terminal: k.address }))
+            .child(div().flex_none().text_color(t.dim + "80").child(guide))
+            .child(div().w(14).flex_none().flex().justify_center().children(opt(sign(t, st, true))))
+            .child(icon(t, k.program, 13))
+            .child(div().flex_1().truncate().text_color(t.muted).child(k.title || k.program?.name || k.address))
+            .child(div().flex_none().text_color(t.dim).child(k.address)));
+        }
       }
     }
     if (!rows.length) rows.push(div().px(8).py(4).text_color(t.dim).italic().child("No agents. Nothing to fix."));

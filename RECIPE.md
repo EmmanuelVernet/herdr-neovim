@@ -40,7 +40,8 @@ Top to bottom, on a `chrome` (`#1e2030`) background, no system title bar:
       ` n` done in green), then agents grouped by space: a folder row with a
       count pill, then one row per agent: status sign (`󰒲` in `dim` when idle),
       program icon, title, `[tab]` in `dim`. The focused agent has the `hover`
-      background.
+      background. Under each agent, its live sub-agents (`hc run` children,
+      nested): `├╴`/`└╴` guides, status sign, icon, title, address in `dim`.
   - **Main**: the active tab's panes, 4px padding around them on `chrome`, 4px
     gap, radius 2, each pane on `background` with a 1px `raised` border; the
     focused pane's border is 1px `accent` (blue). Every pane, even a lone one,
@@ -77,7 +78,8 @@ a named tab keeps its name.
   tab to show it. Right-click opens the space or tab menu.
 - **Agents**: sorted pinned first, then blocked, done, working, idle, then
   start order; this order drives `agent.next` / `agent.prev`. Click focuses the
-  agent's pane, or peeks a sub-agent.
+  agent's pane; clicking a sub-agent peeks it (`terminal.peek`). A sub-agent's
+  `error` shows as blocked and its `done` as idle (its parent carries the news).
 - **Winbar**: click focuses the pane; on hover, split right, split down,
   zoom/unzoom and close buttons appear on the right.
 - The clock refreshes every 15s; everything else re-renders on Herdr's data.
@@ -115,6 +117,9 @@ a named tab keeps its name.
 - No COMMAND mode: mods can't tell when the palette is open.
 - `done` turns `idle` once its pane is looked at, so it never shows as a mode.
 - Read props with `props()`, not `init`'s first argument.
+- Sub-agents without a pane aren't in `agents()`: walk `terminals()` by
+  `parent` (live only). An agent's in-process helpers (Claude Code's own
+  subagents) aren't terminals and never show.
 - Tab numbers in the tabpages are positions, not names.
 
 ## Done when
