@@ -131,7 +131,10 @@ a named tab keeps its name.
   Herdr calls however the overlay goes. `mod.json` overlay: `kind: "popup"`,
   `at: "top"`, `offset: 120`, 600×300, `frame: "none"`.
 - `keys.json`: `"layout:lazyvim": { "cmd-shift-p": "mod.open:lazyvim-cmdline",
-  "cmd-p": "lazyvim.goto" }`, so other layouts keep Herdr's palette and picker.
+  "cmd-p": "lazyvim.goto", "ctrl-shift-p": "mod.open:lazyvim-cmdline",
+  "ctrl-shift-o": "lazyvim.goto" }`
+  (the `ctrl-shift` pair for Linux and Windows; `ctrl-p` belongs to the
+  shell), so other layouts keep Herdr's palette and picker.
   `lazyvim.goto` reaches the lualine's `nextCommand()`: it sets
   `shared("lazyvim.goto")` and opens the cmdline, which starts on `Go to` and
   clears the flag. `mod.open` can't pass props, hence the relay.

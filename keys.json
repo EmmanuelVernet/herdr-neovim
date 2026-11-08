@@ -1,6 +1,8 @@
 {
   "layout:lazyvim": {
     "cmd-shift-p": "mod.open:lazyvim-cmdline",
-    "cmd-p": "lazyvim.goto"
+    "cmd-p": "lazyvim.goto",
+    "ctrl-shift-p": "mod.open:lazyvim-cmdline",
+    "ctrl-shift-o": "lazyvim.goto"
   }
 }
