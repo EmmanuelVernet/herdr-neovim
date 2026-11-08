@@ -1,0 +1,5 @@
+{
+  "layout:lazyvim": {
+    "cmd-shift-p": "mod.open:lazyvim-cmdline"
+  }
+}

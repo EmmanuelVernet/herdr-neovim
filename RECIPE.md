@@ -4,7 +4,8 @@ Herdr dressed as a LazyVim session: a bufferline of tabs across the top, a
 neo-tree style explorer of spaces and a Trouble style agents list on the left,
 panes framed like nvim windows with a winbar each, and a lualine at the bottom
 whose mode follows the focused pane (INSERT while an agent works or you type at
-a shell prompt). Tokyonight moon colors, LazyVim's default, all in JetBrainsMono
+a shell prompt), and `cmd-shift-p` opens a noice-style cmdline that turns it
+COMMAND. Tokyonight moon colors, LazyVim's default, all in JetBrainsMono
 Nerd Font.
 
 ![LazyVim](preview.png)
@@ -56,6 +57,14 @@ Top to bottom, on a `chrome` (`#1e2030`) background, no system title bar:
   ` update` in yellow when an app update is ready, `󰒋 machine` when remote,
   then on `raised`: progress through the space's tabs (`All`, `Top`, `Bot`,
   `n%`) and `space:tab`, then a mode-colored block with ` HH:MM`.
+- **Cmdline**, `cmd-shift-p`: a 600px popup 120px from the top, no dimming,
+  no Herdr frame. noice's cmdline popup: a 34px box on `popover`, rounded 6,
+  1px `accent` border, `Cmdline` (11.5px, `accent`) cut into the top border,
+  a chevron (`U+F054`) in `accent`, then the input. Under it, blink's completion
+  menu: up to 10 rows of 24px on `popover`, rounded 4, 1px `raised` border;
+  each row a kind icon per group in magenta (`ansi5`), the title (matched
+  letters bold in `accent`), its key in `dim`, the group in `dim`. The
+  selected row on `selected`.
 
 Names: an agent's program name, a shell's folder name, else the terminal title;
 a named tab keeps its name.
@@ -65,11 +74,16 @@ a named tab keeps its name.
 - **Status signs** everywhere: working is a braille spinner (`frames`, 80ms) in
   `working`; blocked is `` in `blocked`; done is `●` in `done` (like a
   modified buffer); idle shows nothing (except `󰒲` in the agents list).
-- **Mode**, from the focused pane, first match wins: blocked agent `REPLACE`
+- **Mode**, first match wins: cmdline open `COMMAND` (yellow `ansi3`); then
+  from the focused pane: blocked agent `REPLACE`
   (red `ansi1`); working agent or text at a shell prompt `INSERT` (green
   `ansi2`); zoomed pane `VISUAL` (magenta `ansi5`); shell or other non-agent
   program `TERMINAL` (cyan `ansi6`); idle agent `NORMAL` (blue `ansi4`).
-  Clicking the mode opens the palette.
+  Clicking the mode opens the cmdline.
+- **Cmdline**: the same entries as Herdr's palette (commands, layouts,
+  themes), recent first when empty, fuzzy ranked while typing. Enter runs,
+  ↑/↓, `tab`/`shift-tab` and `ctrl-n`/`ctrl-p` move, page up/down jump 10,
+  the wheel scrolls, Esc or a click beside it closes.
 - **Bufferline**: click selects a tab, double-click renames, right-click opens
   the tab menu, `󰅖` closes, scroll wheel goes to the previous/next tab.
   Tabpage click selects the space, right-click opens the space menu.
@@ -100,8 +114,15 @@ a named tab keeps its name.
   `layout`, `window`, `updates`, `setAgentOrder`, `openOverlay` (the shipped
   `menu` and `new-menu`), and the shipped `mods/pane/*.svg` icons. Commands:
   `tab.select|rename|close|prev|next`, `space.select|new`, `layout.select`,
-  `pane.focus|split|zoom|close`, `terminal.peek`, `app.palette`, `app.update`,
-  `window.*`.
+  `pane.focus|split|zoom|close`, `terminal.peek`, `mod.open`, `app.update`,
+  `window.*`. Reads `shared("lazyvim.cmdline")` for COMMAND.
+- `mods/lazyvim-cmdline/main.js`: a restyled copy of Herdr's
+  `omarchy-palette` (its entries, fuzzy and recent list). `setShared
+  ("lazyvim.cmdline", true)` in `init`, `false` in `async close()`, which
+  Herdr calls however the overlay goes. `mod.json` overlay: `kind: "popup"`,
+  `at: "top"`, `offset: 120`, 600×300, `frame: "none"`.
+- `keys.json`: `"layout:lazyvim": { "cmd-shift-p": "mod.open:lazyvim-cmdline" }`,
+  so other layouts keep Herdr's palette.
 - `mods/lazyvim/insert.zsh`: zsh hooks (`line-init`, `line-pre-redraw`,
   `preexec`) that set the terminal title to `lv:insert` while the prompt has
   text, the folder when empty, the command while it runs. Only inside Herdr
@@ -114,7 +135,12 @@ a named tab keeps its name.
 - Shell INSERT needs `source ~/.config/herdr-app/mods/lazyvim/insert.zsh` at
   the end of `~/.zshrc`, and a new shell. zsh only. Herdr can't see keystrokes,
   and an OSC 7501 report would turn the shell into an agent, hence the title.
-- No COMMAND mode: mods can't tell when the palette is open.
+- COMMAND only works with this cmdline: mods can't tell when Herdr's own
+  palette (`app.palette`) is open, hence the replacement.
+- Shared state is saved to disk: the lualine resets `lazyvim.cmdline` when it
+  starts, or a crash with the cmdline open would leave COMMAND showing.
+- Don't name a method `close` for closing the overlay: that's Herdr's cleanup
+  hook. The cmdline uses `dismiss()`.
 - `done` turns `idle` once its pane is looked at, so it never shows as a mode.
 - Read props with `props()`, not `init`'s first argument.
 - Sub-agents without a pane aren't in `agents()`: walk `terminals()` by
@@ -131,4 +157,6 @@ a named tab keeps its name.
 - `printf '\e]7501;state=blocked\a'` in a shell turns the mode `REPLACE`;
   typing at a prompt (with `insert.zsh` sourced) turns it `INSERT`, `ctrl+u`
   back to `TERMINAL`; zooming the pane shows `VISUAL`.
+- `cmd-shift-p` opens the cmdline and the lualine shows `COMMAND`; Esc, a
+  click beside it, or running an entry brings the old mode back.
 - Clicking `Files` / `Git` swaps the explorer for the shipped panels.

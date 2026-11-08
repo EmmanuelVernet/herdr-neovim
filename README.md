@@ -2,7 +2,8 @@
 
 A LazyVim look for the [Herdr](https://herdr.dev) app: bufferline tabs, a
 neo-tree explorer of spaces, a Trouble-style agents list, nvim-style window
-bars and a lualine whose mode follows the focused pane.
+bars, a lualine whose mode follows the focused pane and a noice-style cmdline
+on `cmd-shift-p`.
 
 ![LazyVim layout](preview.png)
 
@@ -15,9 +16,13 @@ git clone https://github.com/EmmanuelVernet/herdr-neovim
 cd herdr-neovim
 cp layouts/lazyvim.json ~/.config/herdr-app/layouts/
 cp themes/lazyvim.json ~/.config/herdr-app/themes/
-cp -r mods/lazyvim ~/.config/herdr-app/mods/
+cp -r mods/lazyvim mods/lazyvim-cmdline ~/.config/herdr-app/mods/
 herdr-app do layout.switch --name lazyvim
 ```
+
+Then merge `keys.json` into `~/.config/herdr-app/keys.json` (add its
+`layout:lazyvim` section): it binds `cmd-shift-p` to the cmdline in this layout
+only.
 
 Needs [JetBrainsMono Nerd Font](https://www.nerdfonts.com/font-downloads).
 
@@ -31,6 +36,7 @@ echo 'source ~/.config/herdr-app/mods/lazyvim/insert.zsh' >> ~/.zshrc
 
 | Focused pane | Mode |
 |---|---|
+| cmdline open (`cmd-shift-p`) | COMMAND |
 | agent blocked (needs you) | REPLACE |
 | agent working, or typing at a shell prompt | INSERT |
 | pane zoomed | VISUAL |

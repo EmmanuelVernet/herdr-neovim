@@ -10,7 +10,7 @@
 
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
-import { spaces, agents, panes, terminals, focused, run, openOverlay, theme, props, home, layout, window, updates, setAgentOrder } from "herdr";
+import { spaces, agents, panes, terminals, focused, run, openOverlay, theme, props, home, layout, window, updates, setAgentOrder, shared, setShared } from "herdr";
 
 const SPIN = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 const G = {
@@ -20,10 +20,12 @@ const G = {
   files: "\u{F0253}", git: "\u{F02A2}", update: "\u{F06B0}", plus: "\u{F067}",
   sl: "\u{E0B0}", sr: "\u{E0B2}", cl: "\u{E0B1}", cr: "\u{E0B3}",
 };
-// The focused pane as a vim mode, most urgent first: a blocked agent, then
-// typing (a working agent, or a shell prompt with text: insert.zsh titles it
-// "lv:insert"), a zoomed pane (a selection), a shell, an idle agent.
+// The vim mode, most urgent first: the cmdline open (lazyvim-cmdline), then
+// from the focused pane: a blocked agent, then typing (a working agent, or a
+// shell prompt with text: insert.zsh titles it "lv:insert"), a zoomed pane
+// (a selection), a shell, an idle agent.
 function modeOf(p) {
+  if (shared("lazyvim.cmdline")) return ["COMMAND", "ansi3"];
   if (p?.status === "blocked") return ["REPLACE", "ansi1"];
   if (p?.status === "working" || p?.title?.startsWith("lv:insert")) return ["INSERT", "ansi2"];
   if (p?.zoomed) return ["VISUAL", "ansi5"];
@@ -87,7 +89,10 @@ export default class LazyVim extends View {
     this.role = p?.role ?? (p?.pane ? "winbar" : "lualine");
     this.hovered = false;
     this.collapsed = new Set(JSON.parse(localStorage.getItem("collapsed") ?? "[]"));
-    if (this.role === "lualine") cx.timer.every(15000, (cx) => cx.notify()); // the clock
+    if (this.role === "lualine") {
+      cx.timer.every(15000, (cx) => cx.notify()); // the clock
+      setShared("lazyvim.cmdline", false); // shared state persists: a crash mid-cmdline would leave COMMAND
+    }
   }
 
   render() {
@@ -278,7 +283,7 @@ export default class LazyVim extends View {
       .map(([k, g]) => div().flex_none().text_color(t[k]).child(`${g} ${n(k)}`));
     const now = new Date(), clock = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
     return h_flex().size_full().min_w(0).items_center().bg(t.chrome).text_size(12.5).text_color(t.muted)
-      .child(sec(m, dark).id("mode").font_bold().on_click(() => run("app.palette")).child(mode))
+      .child(sec(m, dark).id("mode").font_bold().on_click(() => run("mod.open", { name: "lazyvim-cmdline" })).child(mode))
       .child(arrow(G.sl, m, space?.branch ? mid : t.chrome))
       .when(Boolean(space?.branch), (el) => el.child(sec(mid, m).child(`${G.branch} ${space.branch}`)).child(arrow(G.sl, mid, t.chrome)))
       .child(h_flex().flex_1().min_w(0).h_full().px(10).gap(10).items_center()
