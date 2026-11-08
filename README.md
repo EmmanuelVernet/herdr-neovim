@@ -30,7 +30,11 @@ Then merge `keys.json` into `~/.config/herdr-app/keys.json` (add its
 
 `ctrl-p` stays with the shell (previous command), hence `ctrl-shift-o`.
 
-Needs [JetBrainsMono Nerd Font](https://www.nerdfonts.com/font-downloads).
+No font to install: `mods/lazyvim/fonts/` ships JetBrainsMono Nerd Font Mono
+(Regular and Bold, [SIL OFL](mods/lazyvim/fonts/OFL.txt)), loaded by Herdr when
+the layout shows. Italics come from an installed
+[JetBrainsMono Nerd Font](https://www.nerdfonts.com/font-downloads) if you have
+one.
 
 Optional, zsh only: show INSERT in lualine while you type at a shell prompt.
 

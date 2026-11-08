@@ -110,7 +110,8 @@ a named tab keeps its name.
 ## Built from
 
 - `layouts/lazyvim.json`: root `column` (`titlebar: "none"`, `theme:
-  "lazyvim"`, `font` and `ui_font` `JetBrainsMono Nerd Font Mono`,
+  "lazyvim"`, `font` and `ui_font` `JetBrainsMono Nerd Font Mono`, loaded
+  from `mods/lazyvim/fonts/`,
   `terminal_padding: [4, 8]`) → `tabs` block → `body` row (`sidebar` column:
   `sources` block, `explorer-body` stack of `tree` / `files` / `changes`,
   `trouble` block; `main` tab block with a pane frame and `header`) → `status`
@@ -145,8 +146,11 @@ a named tab keeps its name.
 
 ## Watch out
 
-- Needs **JetBrainsMono Nerd Font** installed; without it the icons and
-  powerline arrows are boxes.
+- The font ships in `mods/lazyvim/fonts/` (JetBrainsMono Nerd Font Mono
+  Regular and Bold, about 2.3 MB each, with `OFL.txt`, which the license
+  requires next to it). Herdr loads a mod's `fonts/` at start and on the next
+  look change, so a fresh install shows it after `layout.switch`. No italic
+  file: italics come from an installed copy, if any.
 - Shell INSERT needs `source ~/.config/herdr-app/mods/lazyvim/insert.zsh` at
   the end of `~/.zshrc`, and a new shell. zsh only. Herdr can't see keystrokes,
   and an OSC 7501 report would turn the shell into an agent, hence the title.
