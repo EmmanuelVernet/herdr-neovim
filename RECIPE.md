@@ -16,7 +16,7 @@ Top to bottom, on a `chrome` (`#1e2030`) background, no system title bar:
 
 - **Bufferline**, 28px, full width, drags the window. Left padding 78px on
   macOS for the traffic lights (placed at `[12, 8]`). One buffer per tab of the
-  active space: a `▎` marker (blue `ansi4` when active, invisible otherwise),
+  active space: a `▍` marker (blue `ansi4` when active, invisible otherwise),
   the program icon, the name (bold when active), then a status sign or a `󰅖`
   close button; a 1px `border` line on its right. The active buffer sits on
   `background` (`#222436`), the rest on `chrome` in `dim`. On the right: a `+`
@@ -46,7 +46,8 @@ Top to bottom, on a `chrome` (`#1e2030`) background, no system title bar:
   - **Main**: the active tab's panes, 4px padding around them on `chrome`, 4px
     gap, radius 2, each pane on `background` with a 1px `raised` border; the
     focused pane's border is 1px `accent` (blue). Every pane, even a lone one,
-    has a 22px **winbar**: `▎` (accent when focused, invisible otherwise),
+    has a 22px **winbar**: `▍` (in the lualine's mode color when focused,
+    invisible otherwise),
     program icon, name (bold when focused), `[Z]` in yellow when zoomed, status
     sign, then the folder as breadcrumbs (`~  code  repo`). The focused
     winbar sits on `background` in `foreground`, the others on `chrome` in `dim`.

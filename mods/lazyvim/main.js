@@ -134,7 +134,7 @@ export default class LazyVim extends View {
         .hover((s) => s.text_color(t.foreground))
         .on_mouse_down("left", (e, cx) => { cx.stop_propagation(); if (e.click_count === 2) run("tab.rename", { id: tab.id }); else run("tab.select", { id: tab.id }); })
         .on_mouse_down("right", (_e, cx) => { cx.stop_propagation(); this.tabMenu(tab, space); })
-        .child(div().text_color(on ? t.ansi4 : t.chrome).child("▎"))
+        .child(div().text_color(on ? t.ansi4 : t.chrome).child("▍"))
         .child(icon(t, tabLead(tab)?.program, 14))
         .child(div().max_w(180).truncate().when(on, (el) => el.font_bold()).child(tabName(tab)))
         .children(status ? [status] : [div().id(`bufx-${tab.id}`).text_color(t.dim).hover((s) => s.text_color(t.blocked))
@@ -322,7 +322,7 @@ export default class LazyVim extends View {
       .text_color(on ? t.foreground : t.dim)
       .on_hover((h, cx) => { this.hovered = h; cx.notify(); })
       .on_click(() => run("pane.focus", { pane }))
-      .child(div().text_color(on ? t.accent : t.chrome).child("▎"))
+      .child(div().text_color(on ? t[modeOf(p)[1]] : t.chrome).child("▍")) // the lualine's mode color
       .child(icon(t, p.program, 13))
       .child(div().flex_none().max_w(220).truncate().when(on, (el) => el.font_bold()).child(paneName(p)))
       .when(p.zoomed, (el) => el.child(div().flex_none().text_color(t.ansi3).child("[Z]")))
