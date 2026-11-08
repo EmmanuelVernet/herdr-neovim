@@ -252,7 +252,9 @@ export default class Cmdline extends View {
     if (this.at >= this.top + SHOWN) this.top = this.at - SHOWN + 1;
     this.top = Math.max(0, Math.min(this.top, rows.length - SHOWN));
     const shown = rows.slice(this.top, this.top + SHOWN);
-    const menu = v_flex().id("cmdline-menu").py(2).rounded(4).border_1().border_color(t.accent).bg(t.popover).text_size(12.5)
+    // On the terminal's `background`, not `popover`: every theme sets the first,
+    // while a theme without `popover` gets a lighter one derived by Herdr.
+    const menu = v_flex().id("cmdline-menu").py(2).rounded(4).border_1().border_color(t.accent).bg(t.background).text_size(12.5)
       .on_scroll_wheel((e, cx) => {
         if (Math.abs(e.delta.y) < 1) return;
         this.move(e.delta.y > 0 ? -1 : 1, rows.length);
@@ -293,10 +295,10 @@ export default class Cmdline extends View {
       .child(
         // noice's cmdline popup: a rounded box with its title cut into the top border.
         div().relative().flex_none()
-          .child(h_flex().h(34).px(12).gap(10).items_center().rounded(6).border_1().border_color(t.accent).bg(t.popover)
+          .child(h_flex().h(34).px(12).gap(10).items_center().rounded(6).border_1().border_color(t.accent).bg(t.background)
             .child(div().flex_none().text_color(t.accent).child(chevron))
             .child(Input.new(this.input).flex_1().h_full().text_size(13).text_color(t.foreground)))
-          .child(div().absolute().top(-8).left(14).px(4).bg(t.popover).text_size(11.5).text_color(t.accent).child(title ?? this.ask.title)),
+          .child(div().absolute().top(-8).left(14).px(4).bg(t.background).text_size(11.5).text_color(t.accent).child(title ?? this.ask.title)),
       )
       .when(Boolean(this.ask?.hint), (el) => el.child(div().px(14).text_size(11.5).text_color(t.dim).child(this.ask.hint)))
       .when(rows.length > 0, (el) => el.child(menu));

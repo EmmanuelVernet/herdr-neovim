@@ -58,15 +58,15 @@ Top to bottom, on a `chrome` (`#1e2030`) background, no system title bar:
   then on `raised`: progress through the space's tabs (`All`, `Top`, `Bot`,
   `n%`) and `space:tab`, then a mode-colored block with ` HH:MM`.
 - **Cmdline**, `cmd-shift-p`: a 600px popup 120px from the top, no dimming,
-  no Herdr frame. noice's cmdline popup: a 34px box on `popover`, rounded 6,
+  no Herdr frame. noice's cmdline popup: a 34px box on `background`, rounded 6,
   1px `accent` border, `Cmdline` (11.5px, `accent`) cut into the top border,
   a chevron (`U+F054`) in `accent`, then the input. Under it, blink's completion
-  menu: up to 10 rows of 24px on `popover`, rounded 4, 1px `accent` border
+  menu: up to 10 rows of 24px on `background`, rounded 4, 1px `accent` border
   like the box; titles on one line, cut off when too long;
   each row a kind icon per group in its own color (spaces a blue `ansi4`
   folder, as in the explorer), the title (matched letters bold in `accent`),
   its key in `dim`, the group in `dim`. The selected row bold on `accent` at
-  25% alpha (a theme's `selected` can sit too close to `popover`);
+  25% alpha (a theme's `selected` can sit too close to `background`);
   `hover` only lights the other rows, so the pointer never hides the
   selection.
 
@@ -158,6 +158,10 @@ a named tab keeps its name.
   palette (`app.palette`) is open, hence the replacement.
 - Shared state is saved to disk: the lualine resets `lazyvim.cmdline` when it
   starts, or a crash with the cmdline open would leave COMMAND showing.
+- The cmdline uses the terminal `background`, not `popover`: a theme file
+  without `popover` (`tokyo-night-storm.json`, say) gets a lighter one derived
+  by Herdr, and a layout's `colors` can't point it at another color name (hex
+  only), so Herdr's own popups keep the derived one.
 - The terminal find bar (`cmd-f`) is Herdr's own: no mod or layout key
   restyles it, and `terminal.search` takes no query, so a mod can't stand in.
 - Don't name a method `close` for closing the overlay: that's Herdr's cleanup
