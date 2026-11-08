@@ -9,7 +9,7 @@
 
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
-import { commands, layouts, keys, spaces, run, theme, props, closeOverlay, shared, setShared, window as win } from "herdr";
+import { commands, layouts, keys, spaces, panes, run, theme, props, closeOverlay, shared, setShared, window as win } from "herdr";
 
 const SHOWN = 10;
 const ROW_H = 24;
@@ -99,11 +99,27 @@ function entries() {
   return list.map((e) => ({ ...e, id: `${e.name}:${JSON.stringify(e.args)}` }));
 }
 
+// Tab names as the explorer shows them (copied from mods/lazyvim: a mod can't
+// import another's files): a named tab keeps its name, else its lead pane's:
+// the agent, else the shell's folder, else the title.
+function paneName(p) {
+  if (p.program?.agent) return p.program.name;
+  if (p.program?.shell) return p.cwd?.split("/").filter(Boolean).pop() ?? "~";
+  return p.title || p.program?.name || "shell";
+}
+
+function tabName(tab) {
+  if (tab.named) return tab.name;
+  const ps = panes().filter((p) => p.tab === tab.id);
+  const lead = ps.find((p) => p.program?.agent) ?? ps.find((p) => p.focused) ?? ps[0];
+  return lead ? paneName(lead) : `${tab.index}`;
+}
+
 // Every space, then each of its tabs, for "Go to…".
 function places() {
   return spaces().flatMap((s) => [
     { name: "space.select", args: { id: s.id }, group: "Space", title: s.name, words: s.branch ?? "" },
-    ...s.tabs.map((tab) => ({ name: "tab.select", args: { id: tab.id }, group: "Tab", title: `${s.name} \u{F460} ${tab.name}`, words: "" })),
+    ...s.tabs.map((tab) => ({ name: "tab.select", args: { id: tab.id }, group: "Tab", title: `${s.name} \u{F460} ${tabName(tab)}`, words: tab.name })),
   ]).concat([
     { name: "tab.new", args: {}, group: "Tab", title: "New tab", words: "" },
     { name: "space.new", args: {}, group: "Space", title: "New space", words: "workspace" },
@@ -217,7 +233,7 @@ export default class Cmdline extends View {
   // The label with blink's matched letters lit.
   label(t, text, hits, on) {
     const fg = on ? t.foreground : t.muted;
-    if (!hits?.length) return div().text_color(fg).child(text);
+    if (!hits?.length) return div().truncate().text_color(fg).child(text);
     return h_flex().children([...text].map((ch, i) =>
       div().text_color(hits.includes(i) ? t.accent : fg).when(hits.includes(i), (d) => d.font_bold()).child(ch === " " ? " " : ch)));
   }
@@ -236,7 +252,7 @@ export default class Cmdline extends View {
     if (this.at >= this.top + SHOWN) this.top = this.at - SHOWN + 1;
     this.top = Math.max(0, Math.min(this.top, rows.length - SHOWN));
     const shown = rows.slice(this.top, this.top + SHOWN);
-    const menu = v_flex().id("cmdline-menu").py(2).rounded(4).border_1().border_color(t.raised).bg(t.popover).text_size(12.5)
+    const menu = v_flex().id("cmdline-menu").py(2).rounded(4).border_1().border_color(t.accent).bg(t.popover).text_size(12.5)
       .on_scroll_wheel((e, cx) => {
         if (Math.abs(e.delta.y) < 1) return;
         this.move(e.delta.y > 0 ? -1 : 1, rows.length);
@@ -246,11 +262,11 @@ export default class Cmdline extends View {
         const i = this.top + j, on = i === this.at, k = keyOf(r.e, bound);
         const [glyph, color] = KIND[r.e.group] ?? ["\u{F0295}", "ansi5"];
         // PmenuSel: the selected row stays lit under the pointer; hover only marks the others.
-        return h_flex().id(`cl-${i}`).h(ROW_H).flex_none().px(8).gap(8).items_center().cursor_pointer()
+        return h_flex().id(`cl-${i}`).h(ROW_H).flex_none().px(12).gap(8).items_center().cursor_pointer()
           .when(on, (el) => el.bg(t.accent + "40").font_bold()).when(!on, (el) => el.hover((s) => s.bg(t.hover)))
           .on_click((_e, cx) => this.go(r.e, cx))
           .child(div().w(16).flex_none().text_color(t[color]).child(glyph))
-          .child(div().flex_1().min_w(0).child(this.label(t, r.e.title, r.hits, on)))
+          .child(div().flex_1().min_w(0).overflow_hidden().child(this.label(t, r.e.title, r.hits, on)))
           .when(Boolean(k), (el) => el.child(div().flex_none().text_color(t.dim).child(k)))
           .child(div().w(64).flex_none().text_color(t.dim).child(r.e.group));
       }));

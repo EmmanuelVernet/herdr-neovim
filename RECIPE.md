@@ -61,7 +61,8 @@ Top to bottom, on a `chrome` (`#1e2030`) background, no system title bar:
   no Herdr frame. noice's cmdline popup: a 34px box on `popover`, rounded 6,
   1px `accent` border, `Cmdline` (11.5px, `accent`) cut into the top border,
   a chevron (`U+F054`) in `accent`, then the input. Under it, blink's completion
-  menu: up to 10 rows of 24px on `popover`, rounded 4, 1px `raised` border;
+  menu: up to 10 rows of 24px on `popover`, rounded 4, 1px `accent` border
+  like the box; titles on one line, cut off when too long;
   each row a kind icon per group in its own color (spaces a blue `ansi4`
   folder, as in the explorer), the title (matched letters bold in `accent`),
   its key in `dim`, the group in `dim`. The selected row bold on `accent` at
@@ -88,7 +89,8 @@ a named tab keeps its name.
   ↑/↓, `tab`/`shift-tab` and `ctrl-n`/`ctrl-p` move, page up/down jump 10,
   the wheel scrolls, Esc or a click beside it closes. "Go to space or tab…"
   turns the same popup into a list of spaces and their tabs (title `Go to`);
-  "Duplicate mod" turns it into a name box (title `Duplicate mod`, a hint
+  Tabs carry the explorer's names (`space › name`; an unnamed tab is its lead
+  pane's agent or folder). "Duplicate mod" turns it into a name box (title `Duplicate mod`, a hint
   under it). Herdr's own picker and prompt never open from it. `cmd-p` opens
   it straight on `Go to` (with New tab / New space at the end).
 - **Bufferline**: click selects a tab, double-click renames, right-click opens
