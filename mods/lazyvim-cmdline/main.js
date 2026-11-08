@@ -2,15 +2,25 @@
 // A restyled copy of Herdr's omarchy-palette (same entries, fuzzy and recent),
 // bound to cmd-shift-p in the lazyvim layout (keys.json). While it's open,
 // shared("lazyvim.cmdline") is true and the lualine shows COMMAND.
+// "Go to…" and "Duplicate mod" stay in this popup (a list of places, a name
+// to type) instead of opening Herdr's picker and prompt, like noice restyles
+// vim.ui.select and vim.ui.input. cmd-p opens it on "Go to" directly: the
+// lualine sets shared("lazyvim.goto") and opens it.
 
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
-import { commands, layouts, keys, run, theme, props, closeOverlay, openOverlay, shared, setShared, window as win } from "herdr";
+import { commands, layouts, keys, spaces, run, theme, props, closeOverlay, shared, setShared, window as win } from "herdr";
 
 const SHOWN = 10;
 const ROW_H = 24;
-// Blink's kind icons, one per group.
-const KIND = { Tab: "\u{F04E9}", Pane: "\u{F0E5E}", Space: "\u{F024B}", Layout: "\u{F0E58}", Terminal: "\u{F489}", Agent: "\u{F06A9}", Window: "\u{F05B6}", App: "\u{F013}" };
+// Blink's kind icons, one per group, each in its own color like blink's kinds;
+// spaces are blue folders as in the explorer.
+const KIND = {
+  Tab: ["\u{F04E9}", "ansi2"], Pane: ["\u{F0E5E}", "ansi6"], Space: ["\u{F024B}", "ansi4"], Layout: ["\u{F0E58}", "ansi5"],
+  Terminal: ["\u{F489}", "ansi2"], Agent: ["\u{F06A9}", "ansi4"], Window: ["\u{F05B6}", "ansi6"], App: ["\u{F013}", "ansi3"],
+};
+// The box's title and chevron per mode: commands, places, a name to type.
+const HEAD = { cmdline: ["Cmdline", "\u{F054}"], goto: ["Go to", "\u{F0219}"], input: [null, "\u{F03EB}"] };
 
 // The palette's names for commands: [command, args, group, title, keywords].
 const NAMED = [
@@ -89,6 +99,17 @@ function entries() {
   return list.map((e) => ({ ...e, id: `${e.name}:${JSON.stringify(e.args)}` }));
 }
 
+// Every space, then each of its tabs, for "Go to…".
+function places() {
+  return spaces().flatMap((s) => [
+    { name: "space.select", args: { id: s.id }, group: "Space", title: s.name, words: s.branch ?? "" },
+    ...s.tabs.map((tab) => ({ name: "tab.select", args: { id: tab.id }, group: "Tab", title: `${s.name} \u{F460} ${tab.name}`, words: "" })),
+  ]).concat([
+    { name: "tab.new", args: {}, group: "Tab", title: "New tab", words: "" },
+    { name: "space.new", args: {}, group: "Space", title: "New space", words: "workspace" },
+  ]).map((e) => ({ ...e, id: `${e.name}:${e.args.id}` }));
+}
+
 // The key bound to an entry: `name` or `name:value` in keys.json.
 function keyOf(e, bound) {
   const v = Object.values(e.args)[0];
@@ -121,7 +142,10 @@ export default class Cmdline extends View {
     this.query = "";
     this.input = InputState.new({});
     this.input.on("change", (_e, cx) => { this.query = this.input.value(); this.at = 0; cx.notify(); });
-    this.input.on("submit", () => this.go(this.rows()[this.at]?.e));
+    this.input.on("submit", (_e, cx) => this.submit(cx));
+    // "cmdline", "goto", or "input" with this.ask = { title, hint, command }.
+    this.mode = shared("lazyvim.goto") ? "goto" : "cmdline";
+    setShared("lazyvim.goto", false);
     this.input.focus();
     cx.timer.after(600, () => this.input.focus());
     this.at = 0;
@@ -139,26 +163,42 @@ export default class Cmdline extends View {
     closeOverlay(props().overlay);
   }
 
-  go(e) {
-    if (!e) return;
-    this.recent = [e.id, ...this.recent.filter((r) => r !== e.id)].slice(0, 20);
-    localStorage.setItem("recent", JSON.stringify(this.recent));
+  // Same popup, new contents: the box empties and the title changes.
+  enter(mode, cx, ask = null) {
+    this.mode = mode;
+    this.ask = ask;
+    this.input.set_value("");
+    this.query = "";
+    this.at = 0;
+    this.top = 0;
+    cx.notify();
+  }
+
+  submit(cx) {
+    if (this.mode !== "input") return this.go(this.rows()[this.at]?.e, cx);
     this.dismiss();
-    if (e.name === "mod.clone") {
-      openOverlay({ mod: "prompt", kind: "dialog", width: 380, props: {
-        title: "Duplicate mod", hint: "Mod to copy; creates <name>-copy",
-        command: { name: "mod.clone", args: {} },
-      } });
-    } else {
-      run(e.name, e.name === "layout.clone" ? { name: shared("layout") ?? "main" } : e.args);
+    run(this.ask.command, { name: this.query.trim() });
+  }
+
+  go(e, cx) {
+    if (!e) return;
+    if (e.name === "mod.open" && e.args.name === "picker") return this.enter("goto", cx);
+    if (e.name === "mod.clone") return this.enter("input", cx, { title: "Duplicate mod", hint: "Mod to copy; creates <name>-copy", command: "mod.clone" });
+    if (this.mode === "cmdline") {
+      this.recent = [e.id, ...this.recent.filter((r) => r !== e.id)].slice(0, 20);
+      localStorage.setItem("recent", JSON.stringify(this.recent));
     }
+    this.dismiss();
+    run(e.name, e.name === "layout.clone" ? { name: shared("layout") ?? "main" } : e.args);
   }
 
   // Recent first when empty, ranked while typing.
   rows() {
-    const all = entries();
+    if (this.mode === "input") return [];
+    const all = this.mode === "goto" ? places() : entries();
     const q = this.query.trim().toLowerCase().replace(/\s+/g, "");
     if (!q) {
+      if (this.mode === "goto") return all.map((e) => ({ e }));
       const recent = this.recent.map((id) => all.find((e) => e.id === id)).filter(Boolean);
       return [...recent, ...all.filter((e) => !recent.includes(e))].map((e) => ({ e }));
     }
@@ -204,14 +244,17 @@ export default class Cmdline extends View {
       })
       .children(shown.map((r, j) => {
         const i = this.top + j, on = i === this.at, k = keyOf(r.e, bound);
+        const [glyph, color] = KIND[r.e.group] ?? ["\u{F0295}", "ansi5"];
+        // PmenuSel: the selected row stays lit under the pointer; hover only marks the others.
         return h_flex().id(`cl-${i}`).h(ROW_H).flex_none().px(8).gap(8).items_center().cursor_pointer()
-          .when(on, (el) => el.bg(t.selected)).hover((s) => s.bg(t.hover))
-          .on_click(() => this.go(r.e))
-          .child(div().w(16).flex_none().text_color(t.ansi5).child(KIND[r.e.group] ?? "\u{F0295}"))
+          .when(on, (el) => el.bg(t.accent + "40").font_bold()).when(!on, (el) => el.hover((s) => s.bg(t.hover)))
+          .on_click((_e, cx) => this.go(r.e, cx))
+          .child(div().w(16).flex_none().text_color(t[color]).child(glyph))
           .child(div().flex_1().min_w(0).child(this.label(t, r.e.title, r.hits, on)))
           .when(Boolean(k), (el) => el.child(div().flex_none().text_color(t.dim).child(k)))
           .child(div().w(64).flex_none().text_color(t.dim).child(r.e.group));
       }));
+    const [title, chevron] = HEAD[this.mode];
     return v_flex()
       .id("cmdline")
       .track_focus(this.handle)
@@ -235,10 +278,11 @@ export default class Cmdline extends View {
         // noice's cmdline popup: a rounded box with its title cut into the top border.
         div().relative().flex_none()
           .child(h_flex().h(34).px(12).gap(10).items_center().rounded(6).border_1().border_color(t.accent).bg(t.popover)
-            .child(div().flex_none().text_color(t.accent).child("\u{F054}"))
+            .child(div().flex_none().text_color(t.accent).child(chevron))
             .child(Input.new(this.input).flex_1().h_full().text_size(13).text_color(t.foreground)))
-          .child(div().absolute().top(-8).left(14).px(4).bg(t.popover).text_size(11.5).text_color(t.accent).child("Cmdline")),
+          .child(div().absolute().top(-8).left(14).px(4).bg(t.popover).text_size(11.5).text_color(t.accent).child(title ?? this.ask.title)),
       )
+      .when(Boolean(this.ask?.hint), (el) => el.child(div().px(14).text_size(11.5).text_color(t.dim).child(this.ask.hint)))
       .when(rows.length > 0, (el) => el.child(menu));
   }
 }

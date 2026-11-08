@@ -21,8 +21,8 @@ herdr-app do layout.switch --name lazyvim
 ```
 
 Then merge `keys.json` into `~/.config/herdr-app/keys.json` (add its
-`layout:lazyvim` section): it binds `cmd-shift-p` to the cmdline in this layout
-only.
+`layout:lazyvim` section): it binds `cmd-shift-p` to the cmdline and `cmd-p`
+to its "Go to" list, in this layout only.
 
 Needs [JetBrainsMono Nerd Font](https://www.nerdfonts.com/font-downloads).
 

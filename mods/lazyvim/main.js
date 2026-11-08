@@ -10,7 +10,7 @@
 
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
-import { spaces, agents, panes, terminals, focused, run, openOverlay, theme, props, home, layout, window, updates, setAgentOrder, shared, setShared } from "herdr";
+import { spaces, agents, panes, terminals, focused, run, openOverlay, theme, props, home, layout, window, updates, setAgentOrder, shared, setShared, nextCommand } from "herdr";
 
 const SPIN = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 const G = {
@@ -92,6 +92,14 @@ export default class LazyVim extends View {
     if (this.role === "lualine") {
       cx.timer.every(15000, (cx) => cx.notify()); // the clock
       setShared("lazyvim.cmdline", false); // shared state persists: a crash mid-cmdline would leave COMMAND
+      // cmd-p (keys.json "lazyvim.goto"): the cmdline, opened on its "Go to" list.
+      cx.spawn(async () => {
+        for (;;) {
+          if ((await nextCommand()) !== "goto") continue;
+          setShared("lazyvim.goto", true);
+          run("mod.open", { name: "lazyvim-cmdline" });
+        }
+      });
     }
   }
 

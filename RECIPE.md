@@ -62,9 +62,12 @@ Top to bottom, on a `chrome` (`#1e2030`) background, no system title bar:
   1px `accent` border, `Cmdline` (11.5px, `accent`) cut into the top border,
   a chevron (`U+F054`) in `accent`, then the input. Under it, blink's completion
   menu: up to 10 rows of 24px on `popover`, rounded 4, 1px `raised` border;
-  each row a kind icon per group in magenta (`ansi5`), the title (matched
-  letters bold in `accent`), its key in `dim`, the group in `dim`. The
-  selected row on `selected`.
+  each row a kind icon per group in its own color (spaces a blue `ansi4`
+  folder, as in the explorer), the title (matched letters bold in `accent`),
+  its key in `dim`, the group in `dim`. The selected row bold on `accent` at
+  25% alpha (a theme's `selected` can sit too close to `popover`);
+  `hover` only lights the other rows, so the pointer never hides the
+  selection.
 
 Names: an agent's program name, a shell's folder name, else the terminal title;
 a named tab keeps its name.
@@ -83,7 +86,11 @@ a named tab keeps its name.
 - **Cmdline**: the same entries as Herdr's palette (commands, layouts,
   themes), recent first when empty, fuzzy ranked while typing. Enter runs,
   ↑/↓, `tab`/`shift-tab` and `ctrl-n`/`ctrl-p` move, page up/down jump 10,
-  the wheel scrolls, Esc or a click beside it closes.
+  the wheel scrolls, Esc or a click beside it closes. "Go to space or tab…"
+  turns the same popup into a list of spaces and their tabs (title `Go to`);
+  "Duplicate mod" turns it into a name box (title `Duplicate mod`, a hint
+  under it). Herdr's own picker and prompt never open from it. `cmd-p` opens
+  it straight on `Go to` (with New tab / New space at the end).
 - **Bufferline**: click selects a tab, double-click renames, right-click opens
   the tab menu, `󰅖` closes, scroll wheel goes to the previous/next tab.
   Tabpage click selects the space, right-click opens the space menu.
@@ -121,8 +128,11 @@ a named tab keeps its name.
   ("lazyvim.cmdline", true)` in `init`, `false` in `async close()`, which
   Herdr calls however the overlay goes. `mod.json` overlay: `kind: "popup"`,
   `at: "top"`, `offset: 120`, 600×300, `frame: "none"`.
-- `keys.json`: `"layout:lazyvim": { "cmd-shift-p": "mod.open:lazyvim-cmdline" }`,
-  so other layouts keep Herdr's palette.
+- `keys.json`: `"layout:lazyvim": { "cmd-shift-p": "mod.open:lazyvim-cmdline",
+  "cmd-p": "lazyvim.goto" }`, so other layouts keep Herdr's palette and picker.
+  `lazyvim.goto` reaches the lualine's `nextCommand()`: it sets
+  `shared("lazyvim.goto")` and opens the cmdline, which starts on `Go to` and
+  clears the flag. `mod.open` can't pass props, hence the relay.
 - `mods/lazyvim/insert.zsh`: zsh hooks (`line-init`, `line-pre-redraw`,
   `preexec`) that set the terminal title to `lv:insert` while the prompt has
   text, the folder when empty, the command while it runs. Only inside Herdr
@@ -139,6 +149,8 @@ a named tab keeps its name.
   palette (`app.palette`) is open, hence the replacement.
 - Shared state is saved to disk: the lualine resets `lazyvim.cmdline` when it
   starts, or a crash with the cmdline open would leave COMMAND showing.
+- The terminal find bar (`cmd-f`) is Herdr's own: no mod or layout key
+  restyles it, and `terminal.search` takes no query, so a mod can't stand in.
 - Don't name a method `close` for closing the overlay: that's Herdr's cleanup
   hook. The cmdline uses `dismiss()`.
 - `done` turns `idle` once its pane is looked at, so it never shows as a mode.
