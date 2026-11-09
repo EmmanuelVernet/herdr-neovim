@@ -7,6 +7,10 @@ on `cmd-shift-p` (`ctrl-shift-p` on Linux and Windows).
 
 ![LazyVim layout](preview.png)
 
+## Demo
+
+https://github.com/user-attachments/assets/59c5c430-b5ca-4858-a29c-6eb278b876ea
+
 ## Install
 
 Ask your agent to add `herdr.dev/layouts/EmmanuelVernet/herdr-neovim`, or by hand:
