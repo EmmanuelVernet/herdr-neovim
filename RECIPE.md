@@ -82,7 +82,8 @@ a named tab keeps its name.
 - **Mode**, first match wins: cmdline open `COMMAND` (yellow `ansi3`); then
   from the focused pane: blocked agent `REPLACE`
   (red `ansi1`); working agent or text at a shell prompt `INSERT` (green
-  `ansi2`); zoomed pane `VISUAL` (magenta `ansi5`); shell or other non-agent
+  `ansi2`); zoomed pane `VISUAL` (magenta `ansi5`); nvim, vim, helix, nano
+  or emacs `CODE` (teal `#4fd6be`); shell or other non-agent
   program `TERMINAL` (cyan `ansi6`); idle agent `NORMAL` (blue `ansi4`).
   Clicking the mode opens the cmdline.
 - **Cmdline**: the same entries as Herdr's palette (commands, layouts,

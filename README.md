@@ -50,6 +50,7 @@ echo 'source ~/.config/herdr-app/mods/lazyvim/insert.zsh' >> ~/.zshrc
 | agent blocked (needs you) | REPLACE |
 | agent working, or typing at a shell prompt | INSERT |
 | pane zoomed | VISUAL |
+| nvim, vim, helix, nano or emacs | CODE |
 | shell or other program | TERMINAL |
 | idle agent | NORMAL |
 

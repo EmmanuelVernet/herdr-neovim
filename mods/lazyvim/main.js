@@ -23,12 +23,16 @@ const G = {
 // The vim mode, most urgent first: the cmdline open (lazyvim-cmdline), then
 // from the focused pane: a blocked agent, then typing (a working agent, or a
 // shell prompt with text: insert.zsh titles it "lv:insert"), a zoomed pane
-// (a selection), a shell, an idle agent.
+// (a selection), then what the pane runs: an editor, a shell, an idle agent.
+// The color is a theme key, or a hex for teal (tokyonight moon's, not in the
+// theme's ANSI slots).
+const EDITORS = ["nvim", "vim", "hx", "nano", "emacs"]; // Herdr program keys
 function modeOf(p) {
   if (shared("lazyvim.cmdline")) return ["COMMAND", "ansi3"];
   if (p?.status === "blocked") return ["REPLACE", "ansi1"];
   if (p?.status === "working" || p?.title?.startsWith("lv:insert")) return ["INSERT", "ansi2"];
   if (p?.zoomed) return ["VISUAL", "ansi5"];
+  if (EDITORS.includes(p?.program?.key)) return ["CODE", "#4fd6be"];
   if (p && !p.program?.agent) return ["TERMINAL", "ansi6"];
   return ["NORMAL", "ansi4"];
 }
@@ -280,7 +284,7 @@ export default class LazyVim extends View {
     const space = spaces().find((s) => s.active);
     const p = panes().find((x) => x.pane === f?.pane);
     const [mode, key] = modeOf(p);
-    const m = t[key], dark = t.accent_foreground, mid = t.raised;
+    const m = t[key] ?? key, dark = t.accent_foreground, mid = t.raised;
     const sec = (bg, fg) => h_flex().h_full().px(10).gap(8).items_center().flex_none().bg(bg).text_color(fg);
     // Powerline arrows: the glyph in the left section's color over the next one's.
     const arrow = (glyph, fg, bg) => div().h_full().flex().items_center().flex_none().bg(bg).text_color(fg).text_size(22).child(glyph);
@@ -322,7 +326,7 @@ export default class LazyVim extends View {
       .text_color(on ? t.foreground : t.dim)
       .on_hover((h, cx) => { this.hovered = h; cx.notify(); })
       .on_click(() => run("pane.focus", { pane }))
-      .child(div().text_color(on ? t[modeOf(p)[1]] : t.chrome).child("▍")) // the lualine's mode color
+      .child(div().text_color(on ? (t[modeOf(p)[1]] ?? modeOf(p)[1]) : t.chrome).child("▍")) // the lualine's mode color
       .child(icon(t, p.program, 13))
       .child(div().flex_none().max_w(220).truncate().when(on, (el) => el.font_bold()).child(paneName(p)))
       .when(p.zoomed, (el) => el.child(div().flex_none().text_color(t.ansi3).child("[Z]")))
