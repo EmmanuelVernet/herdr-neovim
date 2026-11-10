@@ -70,6 +70,39 @@ Top to bottom, on a `chrome` (`#1e2030`) background, no system title bar:
   25% alpha (a theme's `selected` can sit too close to `background`);
   `hover` only lights the other rows, so the pointer never hides the
   selection.
+- **Picker**, `cmd-o` (Files) and `cmd-p` (Go to): snacks' picker, a dialog 92% × 86% of the window,
+  no Herdr frame, two boxes side by side with a 10px gap, each rounded 6 on
+  `background` with a 1px `accent` border and its title (12.5px, bold,
+  `accent`) centered in the top border. Left, `Files`: a 32px input row (the
+  `U+F054` chevron in `accent`, the input, `shown/total` in `dim`) over a 1px
+  `accent` line, then 22px rows: a file icon in its color (mini.icons' look,
+  by name then extension), the path with its folders in `dim` and the name in
+  `muted` (`foreground` when selected), matched letters bold in `accent`; the
+  selected row on `hover`. Right: the selected file's name as title and the
+  file read-only with syntax colors and line numbers (Herdr's code editor,
+  12.5px); images as the picture; a `dim` note for binary or missing files.
+  Under both lists, a 24px key line over a 1px `border` (11.5px, the key in
+  `accent`, what it does in `dim`): `enter @ in <agent>` (its program name),
+  `ctrl-o <editor>`, `ctrl-v/s split (<terminal editor>)` when the tab has an
+  agent, else `enter <editor> (no agent in this tab)` and the split; Go to's `enter go`, `ctrl-n/p move`, `esc
+  close`. Go to's rows, while the query is empty: the explorer's tree, its
+  `├╴`/`└╴`/`│` guides in `dim` at 50%, a space as a chevron, an open blue
+  folder, its bold name, `󰒋 machine`, ` branch` in magenta and its status
+  sign; its tabs under it, each with its lead pane's program icon, name, pane
+  count when above 1 and status sign. Then the agents (a blue robot,
+  `program › title`, status sign, `Agent` in `dim`) and `+ New tab`,
+  `+ New space`. While typing: a flat ranked list, tabs as `space › name`,
+  each row with its kind icon and the kind in `dim`. `n` entries as the
+  count, the title `Go to`. Its preview, titled with the
+  entry. A tab or an agent: its panes stacked, 1px `border` between them,
+  each a 22px winbar on `chrome` (program icon, bold name, status sign,
+  folder in `dim`) over its screen's last lines as plain text (12px, `muted`,
+  bottom-aligned, no colors), filling the box; past three panes, 14 lines
+  each in a scroll. A space: an overview that scrolls, 10px padding: a line
+  with its name (bold), `󰒋 machine`, ` branch` in magenta and its folder in
+  `dim`, then one card per tab (rounded 4, 1px `border`, `accent` for the
+  shown tab): a 22px header (tab icon, bold name, status sign, `n panes` and
+  `· shown` in `dim` on the right) over its panes, 8 lines each.
 
 Names: an agent's program name, a shell's folder name, else the terminal title;
 a named tab keeps its name.
@@ -90,11 +123,33 @@ a named tab keeps its name.
   themes), recent first when empty, fuzzy ranked while typing. Enter runs,
   ↑/↓, `tab`/`shift-tab` and `ctrl-n`/`ctrl-p` move, page up/down jump 10,
   the wheel scrolls, Esc or a click beside it closes. "Go to space or tab…"
-  turns the same popup into a list of spaces and their tabs (title `Go to`);
-  Tabs carry the explorer's names (`space › name`; an unnamed tab is its lead
-  pane's agent or folder). "Duplicate mod" turns it into a name box (title `Duplicate mod`, a hint
-  under it). Herdr's own picker and prompt never open from it. `cmd-p` opens
-  it straight on `Go to` (with New tab / New space at the end).
+  closes it and opens the picker's Go to. "Duplicate mod" turns it into a
+  name box (title `Duplicate mod`, a hint under it). Herdr's own picker and
+  prompt never open from it.
+- **Picker, both sources**: ↑/↓, `tab`/`shift-tab`, `ctrl-n`/`ctrl-p` and
+  `ctrl-j`/`ctrl-k` move, page up/down jump a screen, the wheel scrolls, a
+  click selects and a second click acts like Enter. Releasing a click
+  anywhere but the code preview puts the keyboard back in the input. Esc or a click
+  beside it closes. While open, the lualine shows `COMMAND`.
+- **Go to**: every space, then its tabs (the explorer's names), then every
+  agent (`program › title`), then New tab / New space;
+  fuzzy ranked by title, else by branch, tab name or space. The preview
+  re-reads the selected entry's terminals every 500ms. Enter selects the
+  space or tab, or focuses the agent.
+- **Files**: lists the git top of the focused pane's folder (else the folder
+  itself): tracked and untracked files, not ignored ones, sorted, recent picks
+  first while the query is empty, fuzzy ranked while typing (a match in the
+  file name beats one across folders). The preview follows the selection
+  40ms after it settles. Enter mentions the file in the tab's agent (the
+  focused one, else the first): `@path ` relative to the agent's folder,
+  pasted into its prompt and not sent, and focuses it; with no agent in the
+  tab, Enter opens it like `ctrl-o`. `@path` is what Claude Code, Codex,
+  Gemini CLI and opencode take; another agent gets the same text. `ctrl-o`
+  opens the file in the tab's nvim (it focuses that pane), else with
+  `$VISUAL` / `$EDITOR` (nvim when unset): a GUI one (`code`, `cursor`, `zed`,
+  `subl`…) in its own window, without `-w`; a terminal one in a split to the
+  right. `ctrl-v` / `ctrl-s` split right / down with a terminal editor: yours,
+  else nvim, vim or vi.
 - **Bufferline**: click selects a tab, double-click renames, right-click opens
   the tab menu, `󰅖` closes, scroll wheel goes to the previous/next tab.
   Tabpage click selects the space, right-click opens the space menu.
@@ -120,6 +175,9 @@ a named tab keeps its name.
   block.
 - `themes/lazyvim.json`: tokyonight moon. Named like the layout, so Settings
   offers it only there; every color is read through `theme()`, so any theme works.
+  `solid` / `solid_foreground` (`#82aaff` on `#1b1d2b`) color the primary
+  button of Herdr's own dialogs (Confirm in "Close space?"), which can't be
+  replaced; `popover`, `raised` and `input` color the rest of them.
 - `mods/lazyvim/main.js`: one mod, the piece chosen by `props().role`:
   `bufferline`, `sources`, `explorer`, `trouble`, `lualine`; no role plus a
   `pane` prop is the winbar. Uses `spaces`, `panes`, `agents`, `focused`,
@@ -133,14 +191,34 @@ a named tab keeps its name.
   ("lazyvim.cmdline", true)` in `init`, `false` in `async close()`, which
   Herdr calls however the overlay goes. `mod.json` overlay: `kind: "popup"`,
   `at: "top"`, `offset: 120`, 600×300, `frame: "none"`.
+- `mods/lazyvim-picker/main.js`: standalone (no other lazyvim mod needed;
+  the fuzzy scorer and tab names are copied). `props().source`: `"goto"`, else
+  files. Files from `git ls-files -z
+  -co --exclude-standard`, else `rg --files --null`, else `find`, capped at
+  20000. Preview: `readTextFile` into a readonly `EditorState` (made in a
+  task, never in `render`, released on change). Pictures are copied to
+  `data/lazyvim-picker/preview/<path cksum>-<mtime>.<ext>` under Herdr's home,
+  shrunk to 2048px with `sips` where there is one, and shown with `image()`;
+  copies older than 7 days are removed on the next one. The mention: the text goes on the
+  clipboard (`pbcopy`, `wl-copy` or `xclip`, PowerShell's `Set-Clipboard`),
+  then `pane.focus` and `terminal.paste`. Go to: `places()` from `spaces()`,
+  `panes()` and `agents()`, ranked again on each render, screens from
+  `hc read <terminal>` on a 500ms timer.
+  Opening in the tab's nvim: `hc get <terminal>` gives the foreground pid,
+  a `sh` loop finds `nvim.<pid>.0` (or its child's) under
+  `$TMPDIR/nvim.$USER/*/` or `$XDG_RUNTIME_DIR`, then `nvim --server <socket>
+  --remote <file>`; on any failure, `pane.split {argv: ["nvim", file]}`.
+  Recent picks per repo in `localStorage`. `setShared("lazyvim.cmdline")` like
+  the cmdline. `mod.json` overlay: `kind: "dialog"`, 0.92×0.86, `frame: "none"`.
 - `keys.json`: `"layout:lazyvim": { "cmd-shift-p": "mod.open:lazyvim-cmdline",
   "cmd-p": "lazyvim.goto", "ctrl-shift-p": "mod.open:lazyvim-cmdline",
-  "ctrl-shift-o": "lazyvim.goto" }`
+  "ctrl-shift-o": "lazyvim.goto", "cmd-o": "mod.open:lazyvim-picker",
+  "ctrl-shift-e": "mod.open:lazyvim-picker" }`
   (the `ctrl-shift` pair for Linux and Windows; `ctrl-p` belongs to the
   shell), so other layouts keep Herdr's palette and picker.
-  `lazyvim.goto` reaches the lualine's `nextCommand()`: it sets
-  `shared("lazyvim.goto")` and opens the cmdline, which starts on `Go to` and
-  clears the flag. `mod.open` can't pass props, hence the relay.
+  `lazyvim.goto` reaches the lualine's `nextCommand()`, which opens the
+  picker with `openOverlay({ props: { source: "goto" } })`. `mod.open` can't
+  pass props, hence the relay.
 - `mods/lazyvim/insert.zsh`: zsh hooks (`line-init`, `line-pre-redraw`,
   `preexec`) that set the terminal title to `lv:insert` while the prompt has
   text, the folder when empty, the command while it runs. Only inside Herdr
@@ -174,6 +252,29 @@ a named tab keeps its name.
   `parent` (live only). An agent's in-process helpers (Claude Code's own
   subagents) aren't terminals and never show.
 - Tab numbers in the tabpages are positions, not names.
+- Files: finish the nvim lookup before closing the overlay. Its tasks stop
+  once it closes, so the open runs first and `dismiss()` comes last.
+- Files: the code editor has no scroll-to-line, so a grep picker couldn't
+  show the match in place; this one previews from the top.
+- Picker: `image()` reads only paths under Herdr's home (absolute and `../`
+  paths show nothing), hence the copy into `data/`. A space on another
+  machine gets no image preview.
+- Picker: Herdr keeps every image it decodes until it quits (in memory and
+  as a GPU texture): a 5120×2880 PNG is 56 MB decoded. A new file name per
+  look grew the app past 1.4 GB; one name per picture version, shrunk,
+  keeps it to one small copy each.
+- Picker: the input lets go of the keyboard on any press beside it, so the
+  focus comes back on mouse up (on mouse down, the input's own blur wins).
+- Picker: `hc keys` types named keys only (no `@`, `/` or `.`) and `hc send`
+  always presses Enter, so a mention goes through the clipboard: it replaces
+  what was copied.
+- Picker: a mod can't draw a live terminal, and an overlay's `{terminal}`
+  block is fixed when it opens, so Go to previews `hc read` text, not the
+  terminal itself.
+- Picker: the input keeps `ctrl-e` (end of line) and `ctrl-a` for itself,
+  and a mod can't catch a key before it, hence `ctrl-o` to open.
+- Picker: `sign()` is null for idle; pass it through `children(opt(...))`,
+  `.child(null)` throws.
 
 ## Done when
 
@@ -187,3 +288,13 @@ a named tab keeps its name.
 - `cmd-shift-p` opens the cmdline and the lualine shows `COMMAND`; Esc, a
   click beside it, or running an entry brings the old mode back.
 - Clicking `Files` / `Git` swaps the explorer for the shipped panels.
+- `cmd-o` opens the file picker on the focused pane's repo; typing `main`
+  ranks the `main.js` files first; selecting `preview.png` shows the picture;
+  Enter in a tab with Claude Code leaves `@path ` in its prompt, in a tab with
+  no agent opens the file; `ctrl-o` with nvim in the tab opens the file
+  there, without one opens it with `$EDITOR` (VS Code in its window for
+  `EDITOR=code`).
+- `cmd-p` opens Go to as the explorer's tree; moving through it shows a
+  space's tabs as cards and a tab's or agent's panes with their current
+  text; Enter goes there. Clicking the preview, then the list, keeps the
+  arrows working.

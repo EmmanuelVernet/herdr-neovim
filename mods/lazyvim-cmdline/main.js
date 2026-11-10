@@ -2,14 +2,13 @@
 // A restyled copy of Herdr's omarchy-palette (same entries, fuzzy and recent),
 // bound to cmd-shift-p in the lazyvim layout (keys.json). While it's open,
 // shared("lazyvim.cmdline") is true and the lualine shows COMMAND.
-// "Go to…" and "Duplicate mod" stay in this popup (a list of places, a name
-// to type) instead of opening Herdr's picker and prompt, like noice restyles
-// vim.ui.select and vim.ui.input. cmd-p opens it on "Go to" directly: the
-// lualine sets shared("lazyvim.goto") and opens it.
+// "Duplicate mod" stays in this popup (a name to type) instead of opening
+// Herdr's prompt, like noice restyles vim.ui.input; "Go to…" opens the
+// lazyvim-picker on its goto source instead of Herdr's picker.
 
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
-import { commands, layouts, keys, spaces, panes, run, theme, props, closeOverlay, shared, setShared, window as win } from "herdr";
+import { commands, layouts, keys, run, theme, props, openOverlay, closeOverlay, shared, setShared, window as win } from "herdr";
 
 const SHOWN = 10;
 const ROW_H = 24;
@@ -19,8 +18,8 @@ const KIND = {
   Tab: ["\u{F04E9}", "ansi2"], Pane: ["\u{F0E5E}", "ansi6"], Space: ["\u{F024B}", "ansi4"], Layout: ["\u{F0E58}", "ansi5"],
   Terminal: ["\u{F489}", "ansi2"], Agent: ["\u{F06A9}", "ansi4"], Window: ["\u{F05B6}", "ansi6"], App: ["\u{F013}", "ansi3"],
 };
-// The box's title and chevron per mode: commands, places, a name to type.
-const HEAD = { cmdline: ["Cmdline", "\u{F054}"], goto: ["Go to", "\u{F0219}"], input: [null, "\u{F03EB}"] };
+// The box's title and chevron per mode: commands, a name to type.
+const HEAD = { cmdline: ["Cmdline", "\u{F054}"], input: [null, "\u{F03EB}"] };
 
 // The palette's names for commands: [command, args, group, title, keywords].
 const NAMED = [
@@ -99,33 +98,6 @@ function entries() {
   return list.map((e) => ({ ...e, id: `${e.name}:${JSON.stringify(e.args)}` }));
 }
 
-// Tab names as the explorer shows them (copied from mods/lazyvim: a mod can't
-// import another's files): a named tab keeps its name, else its lead pane's:
-// the agent, else the shell's folder, else the title.
-function paneName(p) {
-  if (p.program?.agent) return p.program.name;
-  if (p.program?.shell) return p.cwd?.split("/").filter(Boolean).pop() ?? "~";
-  return p.title || p.program?.name || "shell";
-}
-
-function tabName(tab) {
-  if (tab.named) return tab.name;
-  const ps = panes().filter((p) => p.tab === tab.id);
-  const lead = ps.find((p) => p.program?.agent) ?? ps.find((p) => p.focused) ?? ps[0];
-  return lead ? paneName(lead) : `${tab.index}`;
-}
-
-// Every space, then each of its tabs, for "Go to…".
-function places() {
-  return spaces().flatMap((s) => [
-    { name: "space.select", args: { id: s.id }, group: "Space", title: s.name, words: s.branch ?? "" },
-    ...s.tabs.map((tab) => ({ name: "tab.select", args: { id: tab.id }, group: "Tab", title: `${s.name} \u{F460} ${tabName(tab)}`, words: tab.name })),
-  ]).concat([
-    { name: "tab.new", args: {}, group: "Tab", title: "New tab", words: "" },
-    { name: "space.new", args: {}, group: "Space", title: "New space", words: "workspace" },
-  ]).map((e) => ({ ...e, id: `${e.name}:${e.args.id}` }));
-}
-
 // The key bound to an entry: `name` or `name:value` in keys.json.
 function keyOf(e, bound) {
   const v = Object.values(e.args)[0];
@@ -159,9 +131,8 @@ export default class Cmdline extends View {
     this.input = InputState.new({});
     this.input.on("change", (_e, cx) => { this.query = this.input.value(); this.at = 0; cx.notify(); });
     this.input.on("submit", (_e, cx) => this.submit(cx));
-    // "cmdline", "goto", or "input" with this.ask = { title, hint, command }.
-    this.mode = shared("lazyvim.goto") ? "goto" : "cmdline";
-    setShared("lazyvim.goto", false);
+    // "cmdline", or "input" with this.ask = { title, hint, command }.
+    this.mode = "cmdline";
     this.input.focus();
     cx.timer.after(600, () => this.input.focus());
     this.at = 0;
@@ -198,12 +169,13 @@ export default class Cmdline extends View {
 
   go(e, cx) {
     if (!e) return;
-    if (e.name === "mod.open" && e.args.name === "picker") return this.enter("goto", cx);
-    if (e.name === "mod.clone") return this.enter("input", cx, { title: "Duplicate mod", hint: "Mod to copy; creates <name>-copy", command: "mod.clone" });
-    if (this.mode === "cmdline") {
-      this.recent = [e.id, ...this.recent.filter((r) => r !== e.id)].slice(0, 20);
-      localStorage.setItem("recent", JSON.stringify(this.recent));
+    if (e.name === "mod.open" && e.args.name === "picker") {
+      this.dismiss();
+      return openOverlay({ mod: "lazyvim-picker", kind: "dialog", width: 0.92, height: 0.86, frame: "none", props: { source: "goto" } });
     }
+    if (e.name === "mod.clone") return this.enter("input", cx, { title: "Duplicate mod", hint: "Mod to copy; creates <name>-copy", command: "mod.clone" });
+    this.recent = [e.id, ...this.recent.filter((r) => r !== e.id)].slice(0, 20);
+    localStorage.setItem("recent", JSON.stringify(this.recent));
     this.dismiss();
     run(e.name, e.name === "layout.clone" ? { name: shared("layout") ?? "main" } : e.args);
   }
@@ -211,10 +183,9 @@ export default class Cmdline extends View {
   // Recent first when empty, ranked while typing.
   rows() {
     if (this.mode === "input") return [];
-    const all = this.mode === "goto" ? places() : entries();
+    const all = entries();
     const q = this.query.trim().toLowerCase().replace(/\s+/g, "");
     if (!q) {
-      if (this.mode === "goto") return all.map((e) => ({ e }));
       const recent = this.recent.map((id) => all.find((e) => e.id === id)).filter(Boolean);
       return [...recent, ...all.filter((e) => !recent.includes(e))].map((e) => ({ e }));
     }

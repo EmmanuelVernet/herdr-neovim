@@ -96,12 +96,11 @@ export default class LazyVim extends View {
     if (this.role === "lualine") {
       cx.timer.every(15000, (cx) => cx.notify()); // the clock
       setShared("lazyvim.cmdline", false); // shared state persists: a crash mid-cmdline would leave COMMAND
-      // cmd-p (keys.json "lazyvim.goto"): the cmdline, opened on its "Go to" list.
+      // cmd-p (keys.json "lazyvim.goto"): the picker on its goto source (mod.open can't pass props).
       cx.spawn(async () => {
         for (;;) {
           if ((await nextCommand()) !== "goto") continue;
-          setShared("lazyvim.goto", true);
-          run("mod.open", { name: "lazyvim-cmdline" });
+          openOverlay({ mod: "lazyvim-picker", kind: "dialog", width: 0.92, height: 0.86, frame: "none", props: { source: "goto" } });
         }
       });
     }

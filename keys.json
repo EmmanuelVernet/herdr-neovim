@@ -3,6 +3,8 @@
     "cmd-shift-p": "mod.open:lazyvim-cmdline",
     "cmd-p": "lazyvim.goto",
     "ctrl-shift-p": "mod.open:lazyvim-cmdline",
-    "ctrl-shift-o": "lazyvim.goto"
+    "ctrl-shift-o": "lazyvim.goto",
+    "cmd-o": "mod.open:lazyvim-picker",
+    "ctrl-shift-e": "mod.open:lazyvim-picker"
   }
 }

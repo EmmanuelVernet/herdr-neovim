@@ -2,8 +2,10 @@
 
 A LazyVim look for the [Herdr](https://herdr.dev) app: bufferline tabs, a
 neo-tree explorer of spaces, a Trouble-style agents list, nvim-style window
-bars, a lualine whose mode follows the focused pane and a noice-style cmdline
-on `cmd-shift-p` (`ctrl-shift-p` on Linux and Windows).
+bars, a lualine whose mode follows the focused pane, a noice-style cmdline
+on `cmd-shift-p` (`ctrl-shift-p` on Linux and Windows) and a snacks-style
+picker with preview: files on `cmd-o` (`ctrl-shift-e`), spaces, tabs and
+agents on `cmd-p` (`ctrl-shift-o`).
 
 ![LazyVim layout](preview.png)
 
@@ -20,7 +22,7 @@ git clone https://github.com/EmmanuelVernet/herdr-neovim
 cd herdr-neovim
 cp layouts/lazyvim.json ~/.config/herdr-app/layouts/
 cp themes/lazyvim.json ~/.config/herdr-app/themes/
-cp -r mods/lazyvim mods/lazyvim-cmdline ~/.config/herdr-app/mods/
+cp -r mods/lazyvim mods/lazyvim-cmdline mods/lazyvim-picker ~/.config/herdr-app/mods/
 herdr-app do layout.switch --name lazyvim
 ```
 
@@ -30,7 +32,8 @@ Then merge `keys.json` into `~/.config/herdr-app/keys.json` (add its
 | | macOS | Linux, Windows |
 |---|---|---|
 | cmdline | `cmd-shift-p` | `ctrl-shift-p` |
-| Go to (spaces and tabs) | `cmd-p` | `ctrl-shift-o` |
+| Go to (spaces, tabs, agents) | `cmd-p` | `ctrl-shift-o` |
+| Files (fuzzy, with preview) | `cmd-o` | `ctrl-shift-e` |
 
 `ctrl-p` stays with the shell (previous command), hence `ctrl-shift-o`.
 
