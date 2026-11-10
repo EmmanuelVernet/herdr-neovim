@@ -8,7 +8,7 @@ a shell prompt), and `cmd-shift-p` opens a noice-style cmdline that turns it
 COMMAND. Tokyonight moon colors, LazyVim's default, all in JetBrainsMono
 Nerd Font.
 
-![LazyVim](preview.png)
+![LazyVim](mods/lazyvim/preview.png)
 
 ## What you see
 
