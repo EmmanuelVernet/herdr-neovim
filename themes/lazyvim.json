@@ -21,6 +21,8 @@
     "dim": "#636da6",
     "accent": "#82aaff",
     "accent_foreground": "#1b1d2b",
+    "solid": "#82aaff",
+    "solid_foreground": "#1b1d2b",
     "working": "#ffc777",
     "blocked": "#ff757f",
     "done": "#c3e88d",
