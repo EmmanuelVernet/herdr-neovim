@@ -16,7 +16,8 @@ import { v_flex, h_flex, InputState, Input, Editor, EditorState } from "gpui-bas
 import { exec, hc, readTextFile, focused, spaces, panes, agents, run, theme, props, closeOverlay, setShared, home, appHome, window as win } from "herdr";
 
 const ROW_H = 22;
-// ponytail: every keystroke ranks the whole list; cap it, index if repos outgrow it.
+// ponytail: every keystroke ranks the whole list in QuickJS (~30-70 ms at 20k
+// files); cap it, rank with `fzf --filter` through exec if big repos lag.
 const MAX = 20000;
 // image() only reads under Herdr's home, so pictures are copied here first
 // (beside the mod's localStorage in data/lazyvim-picker). Herdr keeps every
