@@ -8,6 +8,8 @@ picker with preview: files on `cmd-o` (`ctrl-shift-e`), spaces, tabs and
 agents on `cmd-p` (`ctrl-shift-o`).
 
 ![LazyVim layout](preview.png)
+![LazyVim file picker](file-picker.png)
+![LazyVim space tabs viewer](space-tabs-viewer.png)
 
 ## Demo
 
