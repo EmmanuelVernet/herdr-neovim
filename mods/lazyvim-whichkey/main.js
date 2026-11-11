@@ -24,6 +24,7 @@ const SPEC = [
   ["e", "Explorer", "\u{F0645}", cmd("layout.toggle", { id: "sidebar" })],
   ["?", "Keymaps", "\u{F030C}", cmd("app.help")],
   ["D", "Dashboard", "\u{F0570}", cmd("mod.open", { name: "lazyvim-dashboard" })],
+  ["l", "Lazy (mods)", "\u{F0E58}", cmd("mod.open", { name: "lazyvim-lazy" })],
   ["j", "Jump (flash)", "\u{F0E7}", cmd("mod.open", { name: "lazyvim-flash" })],
   ["f", "file/find", "\u{F0214}", [
     ["f", "Find Files", "\u{F0349}", files],

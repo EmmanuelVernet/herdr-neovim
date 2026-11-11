@@ -128,6 +128,21 @@ Top to bottom, on a `chrome` (`#1e2030`) background, no system title bar:
   12px in that color, are cut into the top border; the body inside in
   `foreground`, 12.5px, one line. A toast without a body shows its title
   there instead.
+- **Lazy**, `<leader>l`: lazy.nvim's `:Lazy` as a dialog 80% × 80%, rounded
+  6, 1px `accent` border on `background`. A 28px header: `herdr mods` bold on
+  `ansi5`, then buttons `Home (H)`, `Check (C)`, `Help (?)` on `raised`
+  (rounded 3), the shown one, or Check while checking, on `accent` in
+  `accent_foreground`. Then 20px lines: `Total: n mods` (and `checked n/m`)
+  bold, then sections `Failed (n)`, `Loaded (n)`, `Not Loaded (n)` in bold,
+  each mod indented: a bullet (`●` blue `ansi4` loaded, `○` `dim` not, `✗`
+  red `ansi1` failed), its name (`foreground`, `muted` when not loaded, bold
+  when selected), a green `✓` (`ansi2`) once it passed a check, its reasons (`󰹘 layout` green
+  `ansi2`, `󰌌 keys` yellow `ansi3`, `󰫢 mod` cyan `ansi6`), `⚙ herdr` in
+  `dim` for Herdr's own, a failure's first line in red. The selected line on
+  `hover`. Enter opens details under it: `dir`, `title`, `from`, `used by`,
+  `check` (green passed, red failed), then two buttons on `raised`, `c check`
+  and `o open folder`, the key in blue. Help lists the keys. The list
+  scrolls, with a scrollbar.
 - **Flash**, `cmd-;` (`ctrl-;`): flash.nvim's labels, a bold letter on
   `ansi5` (magenta) in `accent_foreground`, rounded 2, 4px padding: in each
   winbar after the `▍`, in each buffer after its `▍`, before each tabpage's
@@ -198,7 +213,7 @@ a named tab keeps its name.
   again, a modified key, an unbound key or a click beside the box closes.
   Rows are clickable. LazyVim's leader keys on Herdr: buffers are tabs,
   tabpages are spaces. `<space>` files, `,` Go to, `:` cmdline, `e` sidebar,
-  `?` Herdr's keys, `D` the dashboard, `j` flash; `f` (`f` files, `b` Go to, `n` new tab, `t` terminal),
+  `?` Herdr's keys, `D` the dashboard, `j` flash, `l` lazy; `f` (`f` files, `b` Go to, `n` new tab, `t` terminal),
   `b` (`b` Go to, `d` close, `r` rename, `n`/`p` next/prev), `w` (`-`/`|`
   split, `d` close, `m` zoom, `hjkl` focus, `HJKL` swap), `<tab>` (`<tab>`
   new space, `]`/`[` next/prev, `d` close, `r` rename), `a` (`n`/`p` agent),
@@ -208,8 +223,8 @@ a named tab keeps its name.
   and when a new space becomes the shown one; a space made in the background
   doesn't count, and a second one replaces the first. Like snacks, it goes as
   soon as you act: `f` lists the shown space's folder in the picker, `n` a
-  new tab, `g` Go to, `c` the picker on `~/.config/herdr-app`, `l` the next
-  layout, `q` only closes; any other key, Esc or a click beside it closes
+  new tab, `g` Go to, `c` the picker on `~/.config/herdr-app`, `l` lazy, `q`
+  only closes; any other key, Esc or a click beside it closes
   without acting. Rows click. Also in the cmdline as `Dashboard`.
 - **Notifications**: every toast, Herdr's own (an agent blocked or done
   while you look elsewhere, errors) and each `notify()`. A click runs its
@@ -218,6 +233,19 @@ a named tab keeps its name.
   first, then the space's tabs, then the spaces. Pressing a label focuses
   that pane (`pane.focus`), selects that tab or space; any other key, a
   modified key or a click closes it. Also `<leader>j` and the cmdline.
+- **Lazy**: lists every folder in `mods/` with a `main.js`, sorted by name
+  in each section. Loaded: the shown layout names it (`mod`, `toast`,
+  `terminal_menu` anywhere in `layout()`), a key in a section that applies
+  here opens it (`mod.open:<name>` or `<name>.<command>`, not an app
+  command), or a loaded mod opens it (`mod: "<name>"` or `name: "<name>"` in
+  its `main.js`, two levels deep). `j`/`k`, arrows, `ctrl-n`/`ctrl-p` move,
+  page up/down jump 15; the wheel scrolls. A click selects a mod, a
+  click on the selected one opens or shuts its details; the header buttons
+  and the details' buttons click too. `c` checks the selected mod, `C`
+  all (eight at once, in a task of its own so each result redraws), moving
+  failures to Failed; `o` closes it and opens the picker on the mod's
+  folder; `H` home, `?` help, `q` or Esc close. Also the
+  dashboard's `l` and the cmdline's `Lazy: mods`.
 
 ## Built from
 
@@ -282,6 +310,14 @@ a named tab keeps its name.
   (size, `frame`) is ignored: Herdr frames and sizes it, so the mod insets
   its box in that frame, `flex_1` (not `size_full`, which overflows the
   padding and cuts the bottom border), the title inside the frame's top.
+- `mods/lazyvim-lazy/main.js`: `mod.json` overlay `kind: "dialog"`,
+  0.8×0.8, `frame: "none"`. Herdr's own mods from the keys of
+  `installed.json`; the folder list from one `sh` loop; references from
+  `grep -ohE` over the loaded mods' `main.js`; a title read when its details
+  first open. Check: `herdr-app check <dir>` through `sh` with
+  `~/.local/bin` added to `PATH`. The list is an
+  `overflow_y_scrollbar` with a `ScrollHandle` (`scroll_to_item` on each
+  move, `release()` in `close()`).
 - `mods/lazyvim-flash/main.js`: an invisible popup (`mod.json` overlay
   `kind: "popup"`, `at: "top"`, 1×1, `frame: "none"`) that takes the keys.
   It writes `shared("lazyvim.flash")` = `{ <pane, tab or space id>: letter }`
@@ -364,6 +400,13 @@ a named tab keeps its name.
   set-mark, now taken in this layout.
 - Flash: mods aren't told where panes are drawn, so labels sit in the pieces
   that draw each target, not over the terminals.
+- Lazy: `herdr-app shot` returns the last frame Herdr painted, and an
+  overlay that changes with no window event isn't repainted in it: take two
+  shots, or wait for an event, before judging a "Loading…".
+
+- Lazy: no times next to mods. Unlike lazy.nvim's load times, `herdr-app
+  check` takes 0.4–0.6s for any mod (mostly its own start-up, eight at once),
+  and Herdr doesn't report a mod's load or draw cost.
 
 ## Done when
 
@@ -401,3 +444,6 @@ a named tab keeps its name.
 - `cmd-;` shows a magenta letter in every winbar, buffer and tabpage;
   pressing a pane's letter focuses it, a tabpage's selects that space, Esc
   clears them all.
+- `<leader>l` lists 100-odd mods with the lazyvim ones Loaded; `C` checks
+  them all, a `✓` on each, and a broken one moves to Failed; Enter on a mod shows
+  its folder and title; `o` opens that folder in the picker.
