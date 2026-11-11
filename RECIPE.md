@@ -128,6 +128,10 @@ Top to bottom, on a `chrome` (`#1e2030`) background, no system title bar:
   12px in that color, are cut into the top border; the body inside in
   `foreground`, 12.5px, one line. A toast without a body shows its title
   there instead.
+- **Flash**, `cmd-;` (`ctrl-;`): flash.nvim's labels, a bold letter on
+  `ansi5` (magenta) in `accent_foreground`, rounded 2, 4px padding: in each
+  winbar after the `▍`, in each buffer after its `▍`, before each tabpage's
+  number. Nothing else changes on screen.
 
 Names: an agent's program name, a shell's folder name, else the terminal title;
 a named tab keeps its name.
@@ -194,7 +198,7 @@ a named tab keeps its name.
   again, a modified key, an unbound key or a click beside the box closes.
   Rows are clickable. LazyVim's leader keys on Herdr: buffers are tabs,
   tabpages are spaces. `<space>` files, `,` Go to, `:` cmdline, `e` sidebar,
-  `?` Herdr's keys; `f` (`f` files, `b` Go to, `n` new tab, `t` terminal),
+  `?` Herdr's keys, `D` the dashboard, `j` flash; `f` (`f` files, `b` Go to, `n` new tab, `t` terminal),
   `b` (`b` Go to, `d` close, `r` rename, `n`/`p` next/prev), `w` (`-`/`|`
   split, `d` close, `m` zoom, `hjkl` focus, `HJKL` swap), `<tab>` (`<tab>`
   new space, `]`/`[` next/prev, `d` close, `r` rename), `a` (`n`/`p` agent),
@@ -210,6 +214,10 @@ a named tab keeps its name.
 - **Notifications**: every toast, Herdr's own (an agent blocked or done
   while you look elsewhere, errors) and each `notify()`. A click runs its
   action (going to the agent) and closes it; Herdr times them out.
+- **Flash**: labels from `asdfghjklqwertyuiopzxcvbnm`, the shown tab's panes
+  first, then the space's tabs, then the spaces. Pressing a label focuses
+  that pane (`pane.focus`), selects that tab or space; any other key, a
+  modified key or a click closes it. Also `<leader>j` and the cmdline.
 
 ## Built from
 
@@ -274,11 +282,17 @@ a named tab keeps its name.
   (size, `frame`) is ignored: Herdr frames and sizes it, so the mod insets
   its box in that frame, `flex_1` (not `size_full`, which overflows the
   padding and cuts the bottom border), the title inside the frame's top.
+- `mods/lazyvim-flash/main.js`: an invisible popup (`mod.json` overlay
+  `kind: "popup"`, `at: "top"`, 1×1, `frame: "none"`) that takes the keys.
+  It writes `shared("lazyvim.flash")` = `{ <pane, tab or space id>: letter }`
+  in `init`, `null` in `async close()`; the lazyvim mod's `flashLabel()` draws
+  them, and the lualine resets it when it starts.
 - `keys.json`: `"layout:lazyvim": { "cmd-shift-p": "mod.open:lazyvim-cmdline",
   "cmd-p": "lazyvim.goto", "ctrl-shift-p": "mod.open:lazyvim-cmdline",
   "ctrl-shift-o": "lazyvim.goto", "cmd-o": "mod.open:lazyvim-picker",
   "ctrl-shift-e": "mod.open:lazyvim-picker",
-  "ctrl-space": "mod.open:lazyvim-whichkey" }`
+  "ctrl-space": "mod.open:lazyvim-whichkey",
+  "cmd-;": "mod.open:lazyvim-flash", "ctrl-;": "mod.open:lazyvim-flash" }`
   (the `ctrl-shift` pair for Linux and Windows; `ctrl-p` belongs to the
   shell), so other layouts keep Herdr's palette and picker.
   `lazyvim.goto` reaches the lualine's `nextCommand()`, which opens the
@@ -348,6 +362,8 @@ a named tab keeps its name.
 - Which-key: `ctrl-space` on macOS also switches input source when several
   are set up (System Settings › Keyboard › Shortcuts). In zsh it was
   set-mark, now taken in this layout.
+- Flash: mods aren't told where panes are drawn, so labels sit in the pieces
+  that draw each target, not over the terminals.
 
 ## Done when
 
@@ -382,3 +398,6 @@ a named tab keeps its name.
   `printf '\e]7501;state=blocked\a'` posts `An agent needs you` bottom right
   in a red bordered box, the title in its
   border; clicking it goes to that tab.
+- `cmd-;` shows a magenta letter in every winbar, buffer and tabpage;
+  pressing a pane's letter focuses it, a tabpage's selects that space, Esc
+  clears them all.

@@ -39,6 +39,12 @@ function modeOf(p) {
 const URGENCY = { blocked: 0, done: 1, working: 2, idle: 3 };
 
 const opt = (x) => (x ? [x] : []);
+
+// flash.nvim's FlashLabel on a target while lazyvim-flash is open (it hands out the letters).
+const flashLabel = (t, id) => {
+  const k = shared("lazyvim.flash")?.[id];
+  return k ? div().flex_none().px(4).rounded(2).bg(t.ansi5).text_color(t.accent_foreground).font_bold().child(k) : null;
+};
 const stop = (_e, cx) => cx.stop_propagation();
 
 function find(node, id) {
@@ -96,6 +102,7 @@ export default class LazyVim extends View {
     if (this.role === "lualine") {
       cx.timer.every(15000, (cx) => cx.notify()); // the clock
       setShared("lazyvim.cmdline", false); // shared state persists: a crash mid-cmdline would leave COMMAND
+      setShared("lazyvim.flash", null); // and flash labels
       // cmd-p (keys.json "lazyvim.goto"): the picker on its goto source (mod.open can't pass props).
       cx.spawn(async () => {
         for (;;) {
@@ -151,17 +158,19 @@ export default class LazyVim extends View {
         .on_mouse_down("left", (e, cx) => { cx.stop_propagation(); if (e.click_count === 2) run("tab.rename", { id: tab.id }); else run("tab.select", { id: tab.id }); })
         .on_mouse_down("right", (_e, cx) => { cx.stop_propagation(); this.tabMenu(tab, space); })
         .child(div().text_color(on ? t.ansi4 : t.chrome).child("▍"))
+        .children(opt(flashLabel(t, tab.id)))
         .child(icon(t, tabLead(tab)?.program, 14))
         .child(div().max_w(180).truncate().when(on, (el) => el.font_bold()).child(tabName(tab)))
         .children(status ? [status] : [div().id(`bufx-${tab.id}`).text_color(t.dim).hover((s) => s.text_color(t.blocked))
           .on_mouse_down("left", stop).on_click((_e, cx) => { cx.stop_propagation(); run("tab.close", { id: tab.id }); }).child(G.close)]);
     };
     // Tabpages on the right, like `:tabnew`: one per space.
-    const page = (s, i) => div().id(`page-${s.id}`).h_full().px(9).flex().items_center()
+    const page = (s, i) => div().id(`page-${s.id}`).h_full().px(9).flex().gap(5).items_center()
       .bg(s.active ? t.background : t.chrome).text_color(s.active ? t.foreground : t.dim).when(s.active, (el) => el.font_bold())
       .hover((el) => el.text_color(t.foreground))
       .on_mouse_down("left", (_e, cx) => { cx.stop_propagation(); run("space.select", { id: s.id }); })
       .on_mouse_down("right", (_e, cx) => { cx.stop_propagation(); this.spaceMenu(s); })
+      .children(opt(flashLabel(t, s.id)))
       .child(`${i + 1}`);
     const button = (id, label, action) => div().id(id).h_full().px(9).flex().items_center().text_color(t.dim)
       .hover((s) => s.text_color(t.foreground)).on_mouse_down("left", stop).on_click(action).child(label);
@@ -339,6 +348,7 @@ export default class LazyVim extends View {
       .on_hover((h, cx) => { this.hovered = h; cx.notify(); })
       .on_click(() => run("pane.focus", { pane }))
       .child(div().text_color(on ? (t[modeOf(p)[1]] ?? modeOf(p)[1]) : t.chrome).child("▍")) // the lualine's mode color
+      .children(opt(flashLabel(t, pane)))
       .child(icon(t, p.program, 13))
       .child(div().flex_none().max_w(220).truncate().when(on, (el) => el.font_bold()).child(paneName(p)))
       .when(p.zoomed, (el) => el.child(div().flex_none().text_color(t.ansi3).child("[Z]")))
