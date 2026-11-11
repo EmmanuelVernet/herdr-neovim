@@ -15,6 +15,9 @@ agents on `cmd-p` (`ctrl-shift-o`).
 
 https://github.com/user-attachments/assets/59c5c430-b5ca-4858-a29c-6eb278b876ea
 
+New here? [WORKFLOW.md](WORKFLOW.md) walks through a working session
+with agents, feature by feature, and ends with a cheat sheet.
+
 ## Install
 
 Ask your agent to add `herdr.dev/layouts/EmmanuelVernet/herdr-neovim`, or by hand:
