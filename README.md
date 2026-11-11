@@ -24,7 +24,7 @@ git clone https://github.com/EmmanuelVernet/herdr-neovim
 cd herdr-neovim
 cp layouts/lazyvim.json ~/.config/herdr-app/layouts/
 cp themes/lazyvim.json ~/.config/herdr-app/themes/
-cp -r mods/lazyvim mods/lazyvim-cmdline mods/lazyvim-picker mods/lazyvim-whichkey mods/lazyvim-dashboard ~/.config/herdr-app/mods/
+cp -r mods/lazyvim mods/lazyvim-cmdline mods/lazyvim-picker mods/lazyvim-whichkey mods/lazyvim-dashboard mods/lazyvim-notify ~/.config/herdr-app/mods/
 herdr-app do layout.switch --name lazyvim
 ```
 
@@ -62,6 +62,9 @@ A snacks-style dashboard shows when the layout opens and on each new space:
 `f` find file, `n` new tab, `g` go to, `c` config, `l` next layout. Any
 other key, or Esc, closes it. `<leader>D` (or `Dashboard` in the cmdline)
 brings it back.
+
+Notifications (an agent needs you or is done, errors) show as snacks.notifier
+boxes, the border in the level's color.
 
 ## Modes
 
