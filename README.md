@@ -24,7 +24,7 @@ git clone https://github.com/EmmanuelVernet/herdr-neovim
 cd herdr-neovim
 cp layouts/lazyvim.json ~/.config/herdr-app/layouts/
 cp themes/lazyvim.json ~/.config/herdr-app/themes/
-cp -r mods/lazyvim mods/lazyvim-cmdline mods/lazyvim-picker mods/lazyvim-whichkey mods/lazyvim-dashboard mods/lazyvim-notify mods/lazyvim-flash mods/lazyvim-lazy ~/.config/herdr-app/mods/
+cp -r mods/lazyvim mods/lazyvim-cmdline mods/lazyvim-picker mods/lazyvim-whichkey mods/lazyvim-dashboard mods/lazyvim-notify mods/lazyvim-flash mods/lazyvim-lazy mods/lazyvim-context ~/.config/herdr-app/mods/
 herdr-app do layout.switch --name lazyvim
 ```
 
@@ -38,6 +38,7 @@ Then merge `keys.json` into `~/.config/herdr-app/keys.json` (add its
 | Files (fuzzy, with preview) | `cmd-o` | `ctrl-shift-e` |
 | Leader (which-key) | `ctrl-space` | `ctrl-space` |
 | Flash (jump labels) | `cmd-;` | `ctrl-;` |
+| Send context to agent | `cmd-shift-a` | `ctrl-shift-a` |
 
 `ctrl-p` stays with the shell (previous command), hence `ctrl-shift-o`.
 
@@ -75,6 +76,12 @@ mod: Loaded (the layout, a key or another mod uses it) and Not Loaded. `C`
 runs `herdr-app check` on all of them, `c` on one, `enter` (or a click on
 the selected mod) shows details, `o` opens its folder in the picker. The
 list scrolls and every button clicks.
+
+`cmd-shift-a` (or `<leader>as`, or `Send context to agent` in the cmdline)
+lists what you can hand the tab's agent: another pane's last 80 lines, or
+the `git diff` / staged diff where it works. The right side previews
+exactly what will be pasted; Enter pastes it into the agent's prompt
+without sending it.
 
 ## Modes
 

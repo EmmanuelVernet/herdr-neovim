@@ -8,6 +8,8 @@
     "ctrl-shift-e": "mod.open:lazyvim-picker",
     "ctrl-space": "mod.open:lazyvim-whichkey",
     "cmd-;": "mod.open:lazyvim-flash",
-    "ctrl-;": "mod.open:lazyvim-flash"
+    "ctrl-;": "mod.open:lazyvim-flash",
+    "cmd-shift-a": "mod.open:lazyvim-context",
+    "ctrl-shift-a": "mod.open:lazyvim-context"
   }
 }

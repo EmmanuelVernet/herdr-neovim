@@ -50,6 +50,7 @@ const NAMED = [
   ["terminal.open", {}, "Terminal", "New terminal", "shell term"],
   ["terminal.copy", {}, "Terminal", "Copy", "clipboard yank"],
   ["terminal.paste", {}, "Terminal", "Paste", "clipboard put"],
+  ["mod.open", { name: "lazyvim-context" }, "Agent", "Send context to agent", "paste output diff prompt"],
   ["agent.next", {}, "Agent", "Next agent", ""],
   ["agent.prev", {}, "Agent", "Previous agent", ""],
   ["window.minimize", {}, "Window", "Minimize window", ""],
