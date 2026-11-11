@@ -24,7 +24,7 @@ git clone https://github.com/EmmanuelVernet/herdr-neovim
 cd herdr-neovim
 cp layouts/lazyvim.json ~/.config/herdr-app/layouts/
 cp themes/lazyvim.json ~/.config/herdr-app/themes/
-cp -r mods/lazyvim mods/lazyvim-cmdline mods/lazyvim-picker mods/lazyvim-whichkey mods/lazyvim-dashboard mods/lazyvim-notify ~/.config/herdr-app/mods/
+cp -r mods/lazyvim mods/lazyvim-cmdline mods/lazyvim-picker mods/lazyvim-whichkey mods/lazyvim-dashboard mods/lazyvim-notify mods/lazyvim-flash ~/.config/herdr-app/mods/
 herdr-app do layout.switch --name lazyvim
 ```
 
@@ -37,12 +37,13 @@ Then merge `keys.json` into `~/.config/herdr-app/keys.json` (add its
 | Go to (spaces, tabs, agents) | `cmd-p` | `ctrl-shift-o` |
 | Files (fuzzy, with preview) | `cmd-o` | `ctrl-shift-e` |
 | Leader (which-key) | `ctrl-space` | `ctrl-space` |
+| Flash (jump labels) | `cmd-;` | `ctrl-;` |
 
 `ctrl-p` stays with the shell (previous command), hence `ctrl-shift-o`.
 
 `ctrl-space` is the leader: a which-key popup lists what comes next
 (`<space>` files, `,` buffers, `f` file/find, `b` buffer, `w` windows,
-`<tab>` tabs, `a` agents, `u` ui, `q` quit, `D` dashboard). On macOS, `ctrl-space` also
+`<tab>` tabs, `a` agents, `u` ui, `q` quit, `D` dashboard, `j` flash). On macOS, `ctrl-space` also
 switches input source when you have several; turn that off in System
 Settings › Keyboard › Shortcuts if so.
 
@@ -65,6 +66,9 @@ brings it back.
 
 Notifications (an agent needs you or is done, errors) show as snacks.notifier
 boxes, the border in the level's color.
+
+Flash (`cmd-;`, or `<leader>j`) puts a letter on every pane of the tab, every buffer and every
+tabpage; press it to jump there, anything else cancels.
 
 ## Modes
 
