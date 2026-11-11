@@ -10,7 +10,7 @@
 
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
-import { spaces, agents, panes, terminals, focused, run, openOverlay, theme, props, home, layout, window, updates, setAgentOrder, shared, setShared, nextCommand } from "herdr";
+import { spaces, agents, panes, terminals, focused, run, openOverlay, closeOverlay, theme, props, home, layout, window, updates, setAgentOrder, shared, setShared, nextCommand } from "herdr";
 
 const SPIN = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 const G = {
@@ -102,6 +102,19 @@ export default class LazyVim extends View {
           if ((await nextCommand()) !== "goto") continue;
           openOverlay({ mod: "lazyvim-picker", kind: "dialog", width: 0.92, height: 0.86, frame: "none", props: { source: "goto" } });
         }
+      });
+      // The dashboard, like nvim's on start: when the layout shows, then on each new space
+      // that becomes the shown one (a space made in the background by a script doesn't count).
+      const dashboard = () => {
+        if (this.dashboard) closeOverlay(this.dashboard);
+        this.dashboard = openOverlay({ mod: "lazyvim-dashboard", kind: "dialog", width: 620, height: 560, frame: "none" });
+      };
+      dashboard();
+      this.seen = new Set(spaces().map((s) => s.id));
+      cx.timer.every(400, () => {
+        const all = spaces();
+        if (all.some((s) => s.active && !this.seen.has(s.id))) dashboard();
+        this.seen = new Set(all.map((s) => s.id));
       });
     }
   }

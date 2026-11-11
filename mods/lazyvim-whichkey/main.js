@@ -23,6 +23,7 @@ const SPEC = [
   [":", "Cmdline", "\u{F489}", cmd("mod.open", { name: "lazyvim-cmdline" })],
   ["e", "Explorer", "\u{F0645}", cmd("layout.toggle", { id: "sidebar" })],
   ["?", "Keymaps", "\u{F030C}", cmd("app.help")],
+  ["D", "Dashboard", "\u{F0570}", cmd("mod.open", { name: "lazyvim-dashboard" })],
   ["f", "file/find", "\u{F0214}", [
     ["f", "Find Files", "\u{F0349}", files],
     ["b", "Buffers", "\u{F04E9}", goto],

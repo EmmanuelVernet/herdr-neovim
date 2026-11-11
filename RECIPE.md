@@ -111,6 +111,13 @@ Top to bottom, on a `chrome` (`#1e2030`) background, no system title bar:
   space as `U+F1050`, tab as `U+F0312`), a `➜` in `dim`, an icon and the
   description in magenta (`ansi5`), groups in blue (`ansi4`) as `+name`.
   Under them, `esc close` (and `bs back` below the top level) in `dim`.
+- **Dashboard**, at start, on each new space and on `<leader>D`: snacks'
+  dashboard as a 620×560 dialog, rounded 8 on `background`, 1px `accent`
+  border, centered: the ANSI Shadow logo spelling `HERDR` with
+  LazyVim's `Z z` trail, 14px in blue (`ansi4`), 17px a line; 28px under it,
+  420px wide 30px rows (rounded 4, `hover` under the pointer): icon and
+  description in cyan (`ansi6`), the key bold in yellow (`ansi3`) on the
+  right; then `⚡ Herdr: n spaces · n tabs · n agents working` in cyan.
 
 Names: an agent's program name, a shell's folder name, else the terminal title;
 a named tab keeps its name.
@@ -183,6 +190,13 @@ a named tab keeps its name.
   new space, `]`/`[` next/prev, `d` close, `r` rename), `a` (`n`/`p` agent),
   `u` (`l` next layout, `s` settings, `+`/`-`/`=` zoom), `q` (`q` quit).
   Entries whose command this Herdr lacks are hidden.
+- **Dashboard**: opens when the layout shows (app start, `layout.switch`)
+  and when a new space becomes the shown one; a space made in the background
+  doesn't count, and a second one replaces the first. Like snacks, it goes as
+  soon as you act: `f` lists the shown space's folder in the picker, `n` a
+  new tab, `g` Go to, `c` the picker on `~/.config/herdr-app`, `l` the next
+  layout, `q` only closes; any other key, Esc or a click beside it closes
+  without acting. Rows click. Also in the cmdline as `Dashboard`.
 
 ## Built from
 
@@ -234,6 +248,13 @@ a named tab keeps its name.
   (`[key, desc, icon, command | function | group]`). `mod.json` overlay:
   `kind: "popup"`, `at: "bottom"`, 1×1 of the window, `frame: "none"`; the
   mod draws the box bottom right and closes on a press beside it.
+- `mods/lazyvim-dashboard/main.js`: `mod.json` overlay `kind: "dialog"`,
+  620×560, `frame: "none"`; `mod.open` from which-key and the cmdline. The
+  lualine opens it with `openOverlay` (`mod.open` again would close it) in
+  `init`, and from a 400ms timer comparing `spaces()` ids. It closes itself
+  before acting, so the picker opens over the window. Opens the picker with
+  `props: {root}`: the picker lists that folder instead of the focused
+  pane's.
 - `keys.json`: `"layout:lazyvim": { "cmd-shift-p": "mod.open:lazyvim-cmdline",
   "cmd-p": "lazyvim.goto", "ctrl-shift-p": "mod.open:lazyvim-cmdline",
   "ctrl-shift-o": "lazyvim.goto", "cmd-o": "mod.open:lazyvim-picker",
@@ -300,6 +321,11 @@ a named tab keeps its name.
   and a mod can't catch a key before it, hence `ctrl-o` to open.
 - Picker: `sign()` is null for idle; pass it through `children(opt(...))`,
   `.child(null)` throws.
+- Dashboard: a key it doesn't bind closes it but doesn't reach the shell
+  (`hc keys` types named keys only); the first keystroke goes to it.
+- Dashboard: saving any lazyvim file reloads the lualine, which opens it.
+- Dashboard: `line_height()` takes rems, not px: the logo lines get a
+  fixed `h(17)` instead.
 - Which-key: `ctrl-space` on macOS also switches input source when several
   are set up (System Settings › Keyboard › Shortcuts). In zsh it was
   set-mark, now taken in this layout.
@@ -329,3 +355,7 @@ a named tab keeps its name.
 - `ctrl-space` shows the which-key box bottom right; `w` lists the window
   keys with `<leader> w` as title, `bs` goes back, `|` splits right and
   closes it; Esc or `ctrl-space` again closes it.
+- `layout.switch {name: "lazyvim"}` and `space.new` show the dashboard:
+  the HERDR logo, six keys and the counts; `f` opens the picker on the
+  space's folder, `c` on `~/.config/herdr-app`, `x` just closes it;
+  `<leader>D` brings it back.
