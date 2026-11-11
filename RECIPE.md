@@ -103,6 +103,14 @@ Top to bottom, on a `chrome` (`#1e2030`) background, no system title bar:
   `dim`, then one card per tab (rounded 4, 1px `border`, `accent` for the
   shown tab): a 22px header (tab icon, bold name, status sign, `n panes` and
   `· shown` in `dim` on the right) over its panes, 8 lines each.
+- **Which-key**, `ctrl-space` (the leader): which-key's helix popup, bottom
+  right, 8px from the edge and above the lualine. A 340px box on
+  `background`, rounded 6, 1px `accent` border, the path so far
+  (`<leader> w`) cut into the top border in `accent`. 22px rows, plain
+  mappings first then groups, each alphanumeric: the key in cyan (`ansi6`,
+  space as `U+F1050`, tab as `U+F0312`), a `➜` in `dim`, an icon and the
+  description in magenta (`ansi5`), groups in blue (`ansi4`) as `+name`.
+  Under them, `esc close` (and `bs back` below the top level) in `dim`.
 
 Names: an agent's program name, a shell's folder name, else the terminal title;
 a named tab keeps its name.
@@ -163,6 +171,18 @@ a named tab keeps its name.
 - **Winbar**: click focuses the pane; on hover, split right, split down,
   zoom/unzoom and close buttons appear on the right.
 - The clock refreshes every 15s; everything else re-renders on Herdr's data.
+- **Which-key**: Herdr has no key chords, so the leader opens the popup and
+  it takes the next keys: a group key goes down a level, backspace up (or
+  closes at the top), any other bound key runs and closes. Esc, the leader
+  again, a modified key, an unbound key or a click beside the box closes.
+  Rows are clickable. LazyVim's leader keys on Herdr: buffers are tabs,
+  tabpages are spaces. `<space>` files, `,` Go to, `:` cmdline, `e` sidebar,
+  `?` Herdr's keys; `f` (`f` files, `b` Go to, `n` new tab, `t` terminal),
+  `b` (`b` Go to, `d` close, `r` rename, `n`/`p` next/prev), `w` (`-`/`|`
+  split, `d` close, `m` zoom, `hjkl` focus, `HJKL` swap), `<tab>` (`<tab>`
+  new space, `]`/`[` next/prev, `d` close, `r` rename), `a` (`n`/`p` agent),
+  `u` (`l` next layout, `s` settings, `+`/`-`/`=` zoom), `q` (`q` quit).
+  Entries whose command this Herdr lacks are hidden.
 
 ## Built from
 
@@ -210,10 +230,15 @@ a named tab keeps its name.
   --remote <file>`; on any failure, `pane.split {argv: ["nvim", file]}`.
   Recent picks per repo in `localStorage`. `setShared("lazyvim.cmdline")` like
   the cmdline. `mod.json` overlay: `kind: "dialog"`, 0.92×0.86, `frame: "none"`.
+- `mods/lazyvim-whichkey/main.js`: the leader keys as a nested `SPEC`
+  (`[key, desc, icon, command | function | group]`). `mod.json` overlay:
+  `kind: "popup"`, `at: "bottom"`, 1×1 of the window, `frame: "none"`; the
+  mod draws the box bottom right and closes on a press beside it.
 - `keys.json`: `"layout:lazyvim": { "cmd-shift-p": "mod.open:lazyvim-cmdline",
   "cmd-p": "lazyvim.goto", "ctrl-shift-p": "mod.open:lazyvim-cmdline",
   "ctrl-shift-o": "lazyvim.goto", "cmd-o": "mod.open:lazyvim-picker",
-  "ctrl-shift-e": "mod.open:lazyvim-picker" }`
+  "ctrl-shift-e": "mod.open:lazyvim-picker",
+  "ctrl-space": "mod.open:lazyvim-whichkey" }`
   (the `ctrl-shift` pair for Linux and Windows; `ctrl-p` belongs to the
   shell), so other layouts keep Herdr's palette and picker.
   `lazyvim.goto` reaches the lualine's `nextCommand()`, which opens the
@@ -275,6 +300,9 @@ a named tab keeps its name.
   and a mod can't catch a key before it, hence `ctrl-o` to open.
 - Picker: `sign()` is null for idle; pass it through `children(opt(...))`,
   `.child(null)` throws.
+- Which-key: `ctrl-space` on macOS also switches input source when several
+  are set up (System Settings › Keyboard › Shortcuts). In zsh it was
+  set-mark, now taken in this layout.
 
 ## Done when
 
@@ -298,3 +326,6 @@ a named tab keeps its name.
   space's tabs as cards and a tab's or agent's panes with their current
   text; Enter goes there. Clicking the preview, then the list, keeps the
   arrows working.
+- `ctrl-space` shows the which-key box bottom right; `w` lists the window
+  keys with `<leader> w` as title, `bs` goes back, `|` splits right and
+  closes it; Esc or `ctrl-space` again closes it.
