@@ -147,6 +147,23 @@ Top to bottom, on a `chrome` (`#1e2030`) background, no system title bar:
   `ansi5` (magenta) in `accent_foreground`, rounded 2, 4px padding: in each
   winbar after the `▍`, in each buffer after its `▍`, before each tabpage's
   number. Nothing else changes on screen.
+- **Send context**, `cmd-shift-a` (`ctrl-shift-a`), `<leader>as`: the
+  picker's look, a dialog 72% × 66% with two snacks boxes. Left, 2/5 wide,
+  titled `Send to <agent>` (`No agent in this tab…` in `dim` without one),
+  the sources: per row its number in `dim`, an icon (a green `ansi2`
+  terminal for a pane, a magenta `ansi5` git icon for a diff), `Output of
+  <pane>` (repeats in one tab numbered `#2`) over its last line that isn't
+  a bare prompt (11.5px, `dim`; a pane's row is 38px), or `Git diff` / `Git
+  diff (staged)`, and on the right in `dim` `this tab` / `in <tab>` (its
+  bufferline name), or the diff's `+20 −3 · 2 files` (`nothing`, `not a
+  repo`). The selected row on `hover`, its name bold. Under the list, the
+  key line: `enter paste, not sent`, `1-9 pick`, `ctrl-n/p move`, `esc
+  close`. Right, titled with the source, the exact text Enter pastes,
+  12px in `muted`, scrolling (`Loading…`, `Nothing to send.`); a diff in
+  nvim's diff colors: `+` lines green `ansi2`, `-` red `ansi1`, `@@` cyan
+  `ansi6`, `diff --git` / `index` / `---` / `+++` bold `foreground`.
+  While it's open, each listed pane's winbar shows its row number as a
+  flash label, the target agent's a `➜`.
 
 Names: an agent's program name, a shell's folder name, else the terminal title;
 a named tab keeps its name.
@@ -246,6 +263,16 @@ a named tab keeps its name.
   failures to Failed; `o` closes it and opens the picker on the mod's
   folder; `H` home, `?` help, `q` or Esc close. Also the
   dashboard's `l` and the cmdline's `Lazy: mods`.
+- **Send context**: the target is the shown tab's agent (the focused one,
+  else the first). Sources: every other terminal pane of the space, this
+  tab's first, then the unstaged and staged diff in the agent's folder.
+  A click selects (the preview follows); a click on the selected one,
+  Enter or `1`–`9` pastes it into the agent's prompt and focuses
+  it: a pane as `Output of \`<name>\` in <folder>:` over its last 80 lines
+  in a `text` fence; a diff as `\`git diff\` in <folder>:` in a `diff`
+  fence, cut at 400 lines with a `… (n more lines)` line. Nothing is sent.
+  An empty source says so under the box. `j`/`k`, arrows, `tab`,
+  `ctrl-n`/`ctrl-p` move; Esc closes.
 
 ## Built from
 
@@ -318,6 +345,16 @@ a named tab keeps its name.
   `~/.local/bin` added to `PATH`. The list is an
   `overflow_y_scrollbar` with a `ScrollHandle` (`scroll_to_item` on each
   move, `release()` in `close()`).
+- `mods/lazyvim-context/main.js`: `mod.json` overlay `kind: "dialog"`,
+  0.72×0.66, `frame: "none"`. Pane text from
+  `hc read <terminal> --lines 80`, its `[hc] …` notes and trailing blank
+  lines dropped; each source's text built once, when first selected, and
+  reused by Enter; diffs from
+  `git diff [--staged]` in the agent's `cwd`, their hints from
+  `--shortstat`. The winbar badges go through
+  `shared("lazyvim.flash")`, cleared in `async close()`. Pasted like the
+  picker's mention: clipboard, `pane.focus`,
+  `terminal.paste`, all in a task started before `dismiss()`.
 - `mods/lazyvim-flash/main.js`: an invisible popup (`mod.json` overlay
   `kind: "popup"`, `at: "top"`, 1×1, `frame: "none"`) that takes the keys.
   It writes `shared("lazyvim.flash")` = `{ <pane, tab or space id>: letter }`
@@ -328,7 +365,8 @@ a named tab keeps its name.
   "ctrl-shift-o": "lazyvim.goto", "cmd-o": "mod.open:lazyvim-picker",
   "ctrl-shift-e": "mod.open:lazyvim-picker",
   "ctrl-space": "mod.open:lazyvim-whichkey",
-  "cmd-;": "mod.open:lazyvim-flash", "ctrl-;": "mod.open:lazyvim-flash" }`
+  "cmd-;": "mod.open:lazyvim-flash", "ctrl-;": "mod.open:lazyvim-flash",
+  "cmd-shift-a": "mod.open:lazyvim-context", "ctrl-shift-a": "mod.open:lazyvim-context" }`
   (the `ctrl-shift` pair for Linux and Windows; `ctrl-p` belongs to the
   shell), so other layouts keep Herdr's palette and picker.
   `lazyvim.goto` reaches the lualine's `nextCommand()`, which opens the
@@ -408,6 +446,9 @@ a named tab keeps its name.
   check` takes 0.4–0.6s for any mod (mostly its own start-up, eight at once),
   and Herdr doesn't report a mod's load or draw cost.
 
+- Send context: the paste replaces what was on the clipboard, like the
+  picker's mention.
+
 ## Done when
 
 - `herdr-app check ~/.config/herdr-app/mods/lazyvim` passes and `herdr-app
@@ -447,3 +488,8 @@ a named tab keeps its name.
 - `<leader>l` lists 100-odd mods with the lazyvim ones Loaded; `C` checks
   them all, a `✓` on each, and a broken one moves to Failed; Enter on a mod shows
   its folder and title; `o` opens that folder in the picker.
+- In a tab with Claude Code and a shell that just ran a failing command,
+  `cmd-shift-a` shows `1` on the shell's winbar and `➜` on Claude's;
+  `1` leaves `Output of …` and the shell's last lines in
+  a fence in Claude's prompt, unsent; `Git diff` shows `+n −n · n files`
+  and pastes the diff.
