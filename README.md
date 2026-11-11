@@ -24,7 +24,7 @@ git clone https://github.com/EmmanuelVernet/herdr-neovim
 cd herdr-neovim
 cp layouts/lazyvim.json ~/.config/herdr-app/layouts/
 cp themes/lazyvim.json ~/.config/herdr-app/themes/
-cp -r mods/lazyvim mods/lazyvim-cmdline mods/lazyvim-picker mods/lazyvim-whichkey ~/.config/herdr-app/mods/
+cp -r mods/lazyvim mods/lazyvim-cmdline mods/lazyvim-picker mods/lazyvim-whichkey mods/lazyvim-dashboard ~/.config/herdr-app/mods/
 herdr-app do layout.switch --name lazyvim
 ```
 
@@ -42,7 +42,7 @@ Then merge `keys.json` into `~/.config/herdr-app/keys.json` (add its
 
 `ctrl-space` is the leader: a which-key popup lists what comes next
 (`<space>` files, `,` buffers, `f` file/find, `b` buffer, `w` windows,
-`<tab>` tabs, `a` agents, `u` ui, `q` quit). On macOS, `ctrl-space` also
+`<tab>` tabs, `a` agents, `u` ui, `q` quit, `D` dashboard). On macOS, `ctrl-space` also
 switches input source when you have several; turn that off in System
 Settings › Keyboard › Shortcuts if so.
 
@@ -57,6 +57,11 @@ Optional, zsh only: show INSERT in lualine while you type at a shell prompt.
 ```sh
 echo 'source ~/.config/herdr-app/mods/lazyvim/insert.zsh' >> ~/.zshrc
 ```
+
+A snacks-style dashboard shows when the layout opens and on each new space:
+`f` find file, `n` new tab, `g` go to, `c` config, `l` next layout. Any
+other key, or Esc, closes it. `<leader>D` (or `Dashboard` in the cmdline)
+brings it back.
 
 ## Modes
 

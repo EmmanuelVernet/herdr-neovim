@@ -204,7 +204,8 @@ export default class Picker extends View {
       cx.notify();
     }, () => null);
     cx.spawn(async (cx) => {
-      const cwd = f?.cwd ?? panes().find((p) => p.focused)?.cwd ?? home();
+      // props().root: a folder to list instead (the dashboard's Config).
+      const cwd = props()?.root ?? f?.cwd ?? panes().find((p) => p.focused)?.cwd ?? home();
       const top = await exec("git", ["rev-parse", "--show-toplevel"], { cwd, on: this.on }).catch(() => null);
       this.root = top?.code === 0 ? top.stdout.trim() : cwd;
       this.recent = JSON.parse(localStorage.getItem(`recent:${this.root}`) ?? "[]");

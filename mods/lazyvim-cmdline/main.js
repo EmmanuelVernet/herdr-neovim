@@ -25,6 +25,7 @@ const HEAD = { cmdline: ["Cmdline", "\u{F054}"], input: [null, "\u{F03EB}"] };
 const NAMED = [
   ["tab.new", {}, "Tab", "New tab", "tab agent new task"],
   ["mod.open", { name: "picker" }, "Tab", "Go to space or tab…", "switch jump find"],
+  ["mod.open", { name: "lazyvim-dashboard" }, "Tab", "Dashboard", "start home snacks"],
   ["tab.rename", {}, "Tab", "Rename tab", "tab"],
   ["tab.close", {}, "Tab", "Close tab", "tab kill"],
   ["tab.next", {}, "Tab", "Next tab", "tab"],
