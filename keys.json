@@ -10,6 +10,8 @@
     "cmd-;": "mod.open:lazyvim-flash",
     "ctrl-;": "mod.open:lazyvim-flash",
     "cmd-shift-a": "mod.open:lazyvim-context",
-    "ctrl-shift-a": "mod.open:lazyvim-context"
+    "ctrl-shift-a": "mod.open:lazyvim-context",
+    "cmd-shift-i": "mod.open:lazyvim-inbox",
+    "ctrl-shift-i": "mod.open:lazyvim-inbox"
   }
 }

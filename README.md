@@ -24,7 +24,7 @@ git clone https://github.com/EmmanuelVernet/herdr-neovim
 cd herdr-neovim
 cp layouts/lazyvim.json ~/.config/herdr-app/layouts/
 cp themes/lazyvim.json ~/.config/herdr-app/themes/
-cp -r mods/lazyvim mods/lazyvim-cmdline mods/lazyvim-picker mods/lazyvim-whichkey mods/lazyvim-dashboard mods/lazyvim-notify mods/lazyvim-flash mods/lazyvim-lazy mods/lazyvim-context ~/.config/herdr-app/mods/
+cp -r mods/lazyvim mods/lazyvim-cmdline mods/lazyvim-picker mods/lazyvim-whichkey mods/lazyvim-dashboard mods/lazyvim-notify mods/lazyvim-flash mods/lazyvim-lazy mods/lazyvim-context mods/lazyvim-inbox ~/.config/herdr-app/mods/
 herdr-app do layout.switch --name lazyvim
 ```
 
@@ -39,6 +39,7 @@ Then merge `keys.json` into `~/.config/herdr-app/keys.json` (add its
 | Leader (which-key) | `ctrl-space` | `ctrl-space` |
 | Flash (jump labels) | `cmd-;` | `ctrl-;` |
 | Send context to agent | `cmd-shift-a` | `ctrl-shift-a` |
+| Agent inbox (answer) | `cmd-shift-i` | `ctrl-shift-i` |
 
 `ctrl-p` stays with the shell (previous command), hence `ctrl-shift-o`.
 
@@ -82,6 +83,12 @@ lists what you can hand the tab's agent: another pane's last 80 lines, or
 the `git diff` / staged diff where it works. The right side previews
 exactly what will be pasted; Enter pastes it into the agent's prompt
 without sending it.
+
+`cmd-shift-i` (or `<leader>ai`, or `Agent inbox` in the cmdline) answers
+agents without going to them: every agent, the ones that need you first,
+and the selected one's real terminal beside the list. `j`/`k` pick an
+agent, `1`–`9` answer a blocked one's choices, Enter moves you into its
+terminal to type, `o` goes to it.
 
 ## Modes
 

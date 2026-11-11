@@ -61,6 +61,7 @@ const SPEC = [
     ["r", "Rename Tab", "\u{F03EB}", cmd("space.rename")],
   ]],
   ["a", "agents", "\u{F06A9}", [
+    ["i", "Inbox (answer)", "\u{F02FA}", cmd("mod.open", { name: "lazyvim-inbox" })],
     ["s", "Send Context", "\u{F0552}", cmd("mod.open", { name: "lazyvim-context" })],
     ["n", "Next Agent", "\u{F0142}", cmd("agent.next")],
     ["p", "Previous Agent", "\u{F0141}", cmd("agent.prev")],

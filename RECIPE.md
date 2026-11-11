@@ -164,6 +164,21 @@ Top to bottom, on a `chrome` (`#1e2030`) background, no system title bar:
   `ansi6`, `diff --git` / `index` / `---` / `+++` bold `foreground`.
   While it's open, each listed pane's winbar shows its row number as a
   flash label, the target agent's a `➜`.
+- **Agent inbox**, `cmd-shift-i` (`ctrl-shift-i`), `<leader>ai`: a dialog
+  72% × 66%, two boxes side by side, 10px apart, each rounded 6 on
+  `background` with a 1px `accent` border, 2 : 3. Left, the agents: a 26px
+  title (`Agents`, or `Agents · n need you`, bold `accent`), then 38px rows,
+  blocked first, then done, working, idle, then most recent: its sign
+  (blocked `U+F057` in `blocked`, done `●` in `done`, working the spinner in
+  `working`, idle `U+F04B2` in `dim`), the program name (bold `foreground`
+  when selected, else `muted`) and its title in `dim`, under it `space ›
+  tab` 11.5px in `dim`; on the right `needs you` in `blocked`, else `done` /
+  `working` / `idle` in `dim`. The selected row on `hover`. When it's
+  blocked, its numbered choices as buttons on `raised` (rounded 4, the digit
+  in blue, the label). The key line: `enter type`, `j/k agent`, `1-9
+  choose`, `o go to`, `esc close`. Right, a 26px header (sign, the name bold
+  in `accent`, its status, its title, `typing here goes to the agent (esc
+  too)` in `dim`) over the agent's own terminal, live, in its own colors.
 
 Names: an agent's program name, a shell's folder name, else the terminal title;
 a named tab keeps its name.
@@ -273,6 +288,16 @@ a named tab keeps its name.
   fence, cut at 400 lines with a `… (n more lines)` line. Nothing is sent.
   An empty source says so under the box. `j`/`k`, arrows, `tab`,
   `ctrl-n`/`ctrl-p` move; Esc closes.
+- **Agent inbox**: the list has the keyboard when it opens. `j`/`k`, arrows
+  or `ctrl-n`/`ctrl-p` select another agent; Enter, `tab`, `→` or `i` move
+  the keyboard into its terminal, where everything you type, Esc included,
+  goes to the agent; a click on the list takes it back. `1`–`9` on a blocked
+  agent press that choice in it (how Claude Code and others pick a dialog
+  option) without leaving the list, as its buttons do. `o` closes and
+  focuses its pane; `q`, Esc in the list, a click beside it or
+  `cmd-shift-i` again close. A click selects, a click on the selected agent
+  goes into its terminal. After the picker or cmdline opened over it, the
+  list takes the keyboard back.
 
 ## Built from
 
@@ -345,6 +370,20 @@ a named tab keeps its name.
   `~/.local/bin` added to `PATH`. The list is an
   `overflow_y_scrollbar` with a `ScrollHandle` (`scroll_to_item` on each
   move, `release()` in `close()`).
+- `mods/lazyvim-inbox/main.js`: three roles. No role (`mod.open` from the
+  key, `mod.json` overlay a 1×1 `popup` at the top, `frame: "none"`,
+  `focusable: true`): closes itself, then opens the dialog, or closes it
+  when `shared("lazyvim.inbox")` holds an open one. The dialog is
+  `openOverlay({ kind: "dialog", 0.72×0.66, frame: "none", layout })`: a
+  `row` (gap 10) of a `list` block (weight 2) and a column (weight 3) of a
+  26px `header` block over `{ terminal: <address> }` (padding `[2, 8]`).
+  A terminal block is fixed when the overlay opens, so selecting another
+  agent opens a new dialog, then closes the old one. The list's `async
+  close()` clears `lazyvim.inbox` only if it still names its own overlay.
+  `nextCommand()` `"focus"` and a press on the list refocus it. Choices from
+  one `hc read` when a blocked agent's dialog opens: the last 15 lines
+  matching `1. …` / `❯ 2) …` (box borders allowed). Digits through `hc
+  keys`; into the terminal with `pane.focus {terminal}`.
 - `mods/lazyvim-context/main.js`: `mod.json` overlay `kind: "dialog"`,
   0.72×0.66, `frame: "none"`. Pane text from
   `hc read <terminal> --lines 80`, its `[hc] …` notes and trailing blank
@@ -366,7 +405,8 @@ a named tab keeps its name.
   "ctrl-shift-e": "mod.open:lazyvim-picker",
   "ctrl-space": "mod.open:lazyvim-whichkey",
   "cmd-;": "mod.open:lazyvim-flash", "ctrl-;": "mod.open:lazyvim-flash",
-  "cmd-shift-a": "mod.open:lazyvim-context", "ctrl-shift-a": "mod.open:lazyvim-context" }`
+  "cmd-shift-a": "mod.open:lazyvim-context", "ctrl-shift-a": "mod.open:lazyvim-context",
+  "cmd-shift-i": "mod.open:lazyvim-inbox", "ctrl-shift-i": "mod.open:lazyvim-inbox" }`
   (the `ctrl-shift` pair for Linux and Windows; `ctrl-p` belongs to the
   shell), so other layouts keep Herdr's palette and picker.
   `lazyvim.goto` reaches the lualine's `nextCommand()`, which opens the
@@ -448,6 +488,13 @@ a named tab keeps its name.
 
 - Send context: the paste replaces what was on the clipboard, like the
   picker's mention.
+- Agent inbox: a terminal has one size; while the dialog shows it, the
+  agent reflows to the dialog's size (its own pane too), and back when it
+  closes, like `terminal.peek`.
+- Agent inbox: Esc typed into the terminal goes to the agent (Claude Code
+  stops what it's doing); close from the list, or with `cmd-shift-i`.
+- Agent inbox: `hc read` gives text without colors; the first version drew
+  that and polled it. The terminal block is live and native instead.
 
 ## Done when
 
@@ -493,3 +540,8 @@ a named tab keeps its name.
   `1` leaves `Output of …` and the shell's last lines in
   a fence in Claude's prompt, unsent; `Git diff` shows `+n −n · n files`
   and pastes the diff.
+- With Claude Code asking permission in another tab, `cmd-shift-i` lists it
+  first as `needs you`, its terminal live on the right and `1 Yes` / `2 …`
+  as buttons; `1` answers it and its status moves on; Enter, typing a
+  message and Enter sends it; `j` shows the next agent; after `cmd-o` and
+  Esc the arrows still move the list.
