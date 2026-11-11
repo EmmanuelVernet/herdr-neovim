@@ -26,6 +26,7 @@ const NAMED = [
   ["tab.new", {}, "Tab", "New tab", "tab agent new task"],
   ["mod.open", { name: "picker" }, "Tab", "Go to space or tab…", "switch jump find"],
   ["mod.open", { name: "lazyvim-dashboard" }, "Tab", "Dashboard", "start home snacks"],
+  ["mod.open", { name: "lazyvim-lazy" }, "App", "Lazy: mods", "plugins manager check"],
   ["mod.open", { name: "lazyvim-flash" }, "Pane", "Flash: jump to a pane, tab or space", "jump label leap hop"],
   ["tab.rename", {}, "Tab", "Rename tab", "tab"],
   ["tab.close", {}, "Tab", "Close tab", "tab kill"],

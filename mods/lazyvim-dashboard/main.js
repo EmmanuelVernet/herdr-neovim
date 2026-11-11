@@ -26,7 +26,7 @@ const KEYS = [
   ["n", "\u{F0224}", "New Tab", () => run("tab.new")],
   ["g", "\u{F04E9}", "Go to", picker({ source: "goto" })],
   ["c", "\u{F013}", "Config", () => picker({ root: `${home()}/.config/herdr-app` })()],
-  ["l", "\u{F0E58}", "Next Layout", () => run("layout.switch")],
+  ["l", "\u{F0E58}", "Lazy", () => run("mod.open", { name: "lazyvim-lazy" })],
   ["q", "\u{F0156}", "Close", () => null],
 ];
 
