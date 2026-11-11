@@ -9,6 +9,7 @@
   "terminal_padding": [4, 8],
   "background": "chrome",
   "preview": "mods/lazyvim/preview.png",
+  "toast": "lazyvim-notify",
   "children": [
     {
       "id": "tabs",

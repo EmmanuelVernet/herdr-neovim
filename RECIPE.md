@@ -118,6 +118,16 @@ Top to bottom, on a `chrome` (`#1e2030`) background, no system title bar:
   420px wide 30px rows (rounded 4, `hover` under the pointer): icon and
   description in cyan (`ansi6`), the key bold in yellow (`ansi3`) on the
   right; then `⚡ Herdr: n spaces · n tabs · n agents working` in cyan.
+- **Notifications**: snacks.notifier's compact style inside Herdr's own toast
+  frame (Herdr keeps its border, corners and size for toasts, so a thin
+  outline of its own stays around): a box inset 6px (9px at the top),
+  rounded 6 on `background` (`hover` under the pointer), its 1px border in
+  the level's color, error red (`ansi1`, `U+F0159`), warning yellow (`ansi3`,
+  `U+F0026`), success green (`ansi2`, `U+F05E0`), info cyan (`ansi6`,
+  `U+F02FC`). The level icon (or the agent's own icon) and the bold title,
+  12px in that color, are cut into the top border; the body inside in
+  `foreground`, 12.5px, one line. A toast without a body shows its title
+  there instead.
 
 Names: an agent's program name, a shell's folder name, else the terminal title;
 a named tab keeps its name.
@@ -197,11 +207,14 @@ a named tab keeps its name.
   new tab, `g` Go to, `c` the picker on `~/.config/herdr-app`, `l` the next
   layout, `q` only closes; any other key, Esc or a click beside it closes
   without acting. Rows click. Also in the cmdline as `Dashboard`.
+- **Notifications**: every toast, Herdr's own (an agent blocked or done
+  while you look elsewhere, errors) and each `notify()`. A click runs its
+  action (going to the agent) and closes it; Herdr times them out.
 
 ## Built from
 
 - `layouts/lazyvim.json`: root `column` (`titlebar: "none"`, `theme:
-  "lazyvim"`, `font` and `ui_font` `JetBrainsMono Nerd Font Mono`, loaded
+  "lazyvim"`, `toast: "lazyvim-notify"`, `font` and `ui_font` `JetBrainsMono Nerd Font Mono`, loaded
   from `mods/lazyvim/fonts/`,
   `terminal_padding: [4, 8]`) → `tabs` block → `body` row (`sidebar` column:
   `sources` block, `explorer-body` stack of `tree` / `files` / `changes`,
@@ -255,6 +268,12 @@ a named tab keeps its name.
   before acting, so the picker opens over the window. Opens the picker with
   `props: {root}`: the picker lists that folder instead of the focused
   pane's.
+- `mods/lazyvim-notify/main.js`: named by the layout root's `"toast":
+  "lazyvim-notify"`, so other layouts keep Herdr's toast. Reads `props()`:
+  `{title, body, level, icon, action, overlay}`. A toast's `mod.json` overlay
+  (size, `frame`) is ignored: Herdr frames and sizes it, so the mod insets
+  its box in that frame, `flex_1` (not `size_full`, which overflows the
+  padding and cuts the bottom border), the title inside the frame's top.
 - `keys.json`: `"layout:lazyvim": { "cmd-shift-p": "mod.open:lazyvim-cmdline",
   "cmd-p": "lazyvim.goto", "ctrl-shift-p": "mod.open:lazyvim-cmdline",
   "ctrl-shift-o": "lazyvim.goto", "cmd-o": "mod.open:lazyvim-picker",
@@ -359,3 +378,7 @@ a named tab keeps its name.
   the HERDR logo, six keys and the counts; `f` opens the picker on the
   space's folder, `c` on `~/.config/herdr-app`, `x` just closes it;
   `<leader>D` brings it back.
+- A shell in a tab you aren't looking at running
+  `printf '\e]7501;state=blocked\a'` posts `An agent needs you` bottom right
+  in a red bordered box, the title in its
+  border; clicking it goes to that tab.
