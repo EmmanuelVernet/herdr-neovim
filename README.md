@@ -13,7 +13,8 @@ agents on `cmd-p` (`ctrl-shift-o`).
 
 ## Demo
 
-https://github.com/user-attachments/assets/59c5c430-b5ca-4858-a29c-6eb278b876ea
+https://github.com/user-attachments/assets/fd8a0b46-2cd7-44d3-a04c-4de04e800f4c
+
 
 New here? [WORKFLOW.md](WORKFLOW.md) walks through a working session
 with agents, feature by feature, and ends with a cheat sheet.
