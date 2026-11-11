@@ -24,7 +24,7 @@ git clone https://github.com/EmmanuelVernet/herdr-neovim
 cd herdr-neovim
 cp layouts/lazyvim.json ~/.config/herdr-app/layouts/
 cp themes/lazyvim.json ~/.config/herdr-app/themes/
-cp -r mods/lazyvim mods/lazyvim-cmdline mods/lazyvim-picker ~/.config/herdr-app/mods/
+cp -r mods/lazyvim mods/lazyvim-cmdline mods/lazyvim-picker mods/lazyvim-whichkey ~/.config/herdr-app/mods/
 herdr-app do layout.switch --name lazyvim
 ```
 
@@ -36,8 +36,15 @@ Then merge `keys.json` into `~/.config/herdr-app/keys.json` (add its
 | cmdline | `cmd-shift-p` | `ctrl-shift-p` |
 | Go to (spaces, tabs, agents) | `cmd-p` | `ctrl-shift-o` |
 | Files (fuzzy, with preview) | `cmd-o` | `ctrl-shift-e` |
+| Leader (which-key) | `ctrl-space` | `ctrl-space` |
 
 `ctrl-p` stays with the shell (previous command), hence `ctrl-shift-o`.
+
+`ctrl-space` is the leader: a which-key popup lists what comes next
+(`<space>` files, `,` buffers, `f` file/find, `b` buffer, `w` windows,
+`<tab>` tabs, `a` agents, `u` ui, `q` quit). On macOS, `ctrl-space` also
+switches input source when you have several; turn that off in System
+Settings › Keyboard › Shortcuts if so.
 
 No font to install: `mods/lazyvim/fonts/` ships JetBrainsMono Nerd Font Mono
 (Regular and Bold, [SIL OFL](mods/lazyvim/fonts/OFL.txt)), loaded by Herdr when
